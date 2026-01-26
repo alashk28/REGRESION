@@ -1,0 +1,91 @@
+---
+title: "Tutorial básico de Regresión"
+author: "Lucia Fatima Carbajal Falcon"
+date: "2026-01-26"
+output: html_document
+---
+
+
+## Introducción
+
+a. Importancia de la regresión lineal múltiple: dos párrafos
+b. Objetivos de aprendizaje (general y específicos): ¿qué se espera que aprenda el
+estudiante una vez que ha replicado el tutorial? Los objetivos deben ir formulados
+con verbo en infinitivo (un verbo por objetivo).
+
+
+## Caso (dataset)
+
+En la actualidad educativa, el uso de recursos de inteligencia artificial se ha popularizado entre los alumnos como un medio complementario para el aprendizaje y la ejecución de tareas académicas. Sin embargo, hay dudas respecto al verdadero efecto de estas tecnologías en el desempeño académico. Así, el objetivo de este tutorial es examinar cómo el uso de la inteligencia artificial se relaciona con el desempeño académico de los estudiantes, el cual se medirá a través de sus calificaciones posteriores, teniendo en cuenta además aspectos importantes como las horas dedicadas al estudio cada día y el rendimiento académico previo, utilizando un modelo de regresión lineal múltiple.
+
+b. Origen del dataset: indicar fuente recuperable.
+
+## Definición de variables
+
+#### Variable dependiente
+
+**grades_after_ai**  
+- **Tipo:** Cuantitativa continua  
+- **Descripción:** Calificación obtenida por el estudiante después de utilizar herramientas de inteligencia artificial como apoyo académico. Representa el rendimiento académico posterior.
+
+#### Variables independientes
+
+**study_hours_per_day**  
+- **Tipo:** Cuantitativa continua  
+- **Descripción:** Número promedio de horas que el estudiante dedica al estudio por día.
+
+**uses_ai**  
+- **Tipo:** Cualitativa dicotómica (dummy)  
+- **Descripción:** Variable que indica si el estudiante utiliza herramientas de inteligencia artificial como apoyo en sus estudios (1 = sí, 0 = no).
+
+**grades_before_ai**  
+- **Tipo:** Cuantitativa continua  
+- **Descripción:** Calificación obtenida por el estudiante antes del uso de herramientas de inteligencia artificial.
+
+## Exploración de datos
+
+```{r}
+datos = read.csv("students_ai_usage.csv")
+
+head(datos)
+```
+
+
+b. Resumen descriptivo univariado (además de realizar el resumen descriptivo,
+explicar por qué se hace)
+
+c. Resumen descriptivo bivariado (además de realizar el resumen descriptivo, explicar
+por qué se hace)
+
+## Modelamiento
+
+\[
+Y_i = \beta_0 + \beta_1 X_{1i} + \beta_2 X_{2i} + \beta_3 X_{3i} + \varepsilon_i
+\]
+
+donde:
+\[
+Y_i = \text{grades_after_ai}, \quad
+X_{1i} = \text{study_hours_per_day}, \quad
+X_{2i} = \text{uses_ai}, \quad
+X_{3i} = \text{grades_before_ai}.
+\]
+
+
+```{r}
+modelo = lm(grades_after_ai ~ study_hours_per_day + uses_ai + grades_before_ai, data = datos)
+
+summary(modelo)
+```
+
+
+c. Interpretación de los coeficientes de regresión
+d. Coeficiente de determinación
+e. Verificación del supuesto de normalidad de errores
+f. Verificación del supuesto de homocedasticidad de errores
+g. Verificación del supuesto de independencia de errores
+h. Transformación de datos (si aplica)
+i. Prueba de hipótesis global
+j. Pruebas de hipótesis individuales
+k. Estimación de una media (puntual e intervalar)
+l. Predicción de un nuevo valor (puntual e intervalar)
