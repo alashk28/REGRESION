@@ -1,91 +1,227 @@
 ---
 title: "Tutorial básico de Regresión"
-author: "Lucia Fatima Carbajal Falcon"
+author: 
+- "Lucia Fatima Carbajal Falcon"
+- "Arlette Alashka Carmen Tullume"
+- "Gabriel Omar Evaristo Jacinto"
 date: "2026-01-26"
 output: html_document
 ---
 
+^1^ Universidad Nacional Agraria La Molina; ^2^ Departamento Estadística e Informática
 
 ## Introducción
 
-a. Importancia de la regresión lineal múltiple: dos párrafos
-b. Objetivos de aprendizaje (general y específicos): ¿qué se espera que aprenda el
-estudiante una vez que ha replicado el tutorial? Los objetivos deben ir formulados
-con verbo en infinitivo (un verbo por objetivo).
+a.  Importancia de la regresión lineal múltiple:
 
+    La regresión lineal múltiple es fundamental porque permite modelar fenómenos complejos donde una variable de interés depende de varios factores a la vez. A diferencia de la regresión simple, esta técnica ofrece una visión más realista al analizar cómo múltiples variables independientes influyen simultáneamente en un resultado, permitiendo aislar el efecto individual de cada una mientras se mantienen las demás constantes.
+
+    Su relevancia radica en su doble capacidad: **explicativa y predictiva**. Por un lado, ayuda a identificar qué factores tienen un impacto real y significativo en un problema; por otro, permite construir fórmulas precisas para predecir escenarios futuros, lo que la convierte en una herramienta indispensable para la toma de decisiones basada en datos en cualquier disciplina científica.
+
+b.  Objetivos de aprendizaje
+
+    \- Objetivo General:
+
+    -   Capacitar al estudiante en la implementación y validación de un modelo de regresión lineal múltiple utilizando el software estadÍstico R.
+
+    \- Objetivos Específicos:
+
+    -   Comprender la importancia de incluir múltiples variables predictoras para explicar un fenómeno real.
+
+    -   Ejecutar los ajustes de modelos lineales mediante la función lm() de R.
+
+    -   Interpretar los coeficientes de regresión y su impacto en la variable respuesta.
+
+    -   Evaluar la calidad del ajuste mediante el coeficiente de determinación R-cuadrado.
+
+    -   Validar los supuestos de normalidad, homecedasticidad e independencia a través de pruebas diagnósticas.
+
+    -   Predecir nuevos valores de la variable respuesta utilizando el modelo final optimizado.
 
 ## Caso (dataset)
 
 En la actualidad educativa, el uso de recursos de inteligencia artificial se ha popularizado entre los alumnos como un medio complementario para el aprendizaje y la ejecución de tareas académicas. Sin embargo, hay dudas respecto al verdadero efecto de estas tecnologías en el desempeño académico. Así, el objetivo de este tutorial es examinar cómo el uso de la inteligencia artificial se relaciona con el desempeño académico de los estudiantes, el cual se medirá a través de sus calificaciones posteriores, teniendo en cuenta además aspectos importantes como las horas dedicadas al estudio cada día y el rendimiento académico previo, utilizando un modelo de regresión lineal múltiple.
 
-b. Origen del dataset: indicar fuente recuperable.
+b.  Origen del dataset: indicar fuente recuperable.
 
 ## Definición de variables
 
 #### Variable dependiente
 
-**grades_after_ai**  
-- **Tipo:** Cuantitativa continua  
-- **Descripción:** Calificación obtenida por el estudiante después de utilizar herramientas de inteligencia artificial como apoyo académico. Representa el rendimiento académico posterior.
+1. **nota_despues**\
+- **Tipo:** Cuantitativa continua\
+- **Descripción:** Calificación final del estudiante tras el periodo de uso de herramientas de IA. Es la variable que deseamos predecir o explicar.
 
 #### Variables independientes
 
-**study_hours_per_day**  
-- **Tipo:** Cuantitativa continua  
-- **Descripción:** Número promedio de horas que el estudiante dedica al estudio por día.
+1. **horas_estudio**\
+- **Tipo:** Cuantitativa continua\
+- **Descripción:** Tiempo promedio diario (en horas) dedicado al estudio personal.
 
-**uses_ai**  
-- **Tipo:** Cualitativa dicotómica (dummy)  
+2. **usa_ia**\
+- **Tipo:** Cualitativa dicotómica (dummy)\
 - **Descripción:** Variable que indica si el estudiante utiliza herramientas de inteligencia artificial como apoyo en sus estudios (1 = sí, 0 = no).
 
-**grades_before_ai**  
-- **Tipo:** Cuantitativa continua  
+3. **nota_antes**\
+- **Tipo:** Cuantitativa continua\
 - **Descripción:** Calificación obtenida por el estudiante antes del uso de herramientas de inteligencia artificial.
 
 ## Exploración de datos
 
 ```{r}
+# Cargar librerías
+library(dplyr)
+
+# Lecutra del dataset
 datos = read.csv("students_ai_usage.csv")
 
+# Renombrar columnas para un mejor manejo
+datos <- datos |>
+  rename(
+    edad = age,
+    nivel_educativo = education_level,
+    horas_estudio = study_hours_per_day,
+    usa_ia = uses_ai,
+    herramientas_ia = ai_tools_used,
+    proposito_ia = purpose_of_ai,
+    nota_antes = grades_before_ai,
+    nota_despues = grades_after_ai,
+    tiempo_pantalla = daily_screen_time_hours
+  )
+
+# Convertimos a factor "usa_ia" para que R entienda que "Sí" y "No" son categorías, no solo texto
+datos$usa_ia <- factor(datos$usa_ia, levels = c("No", "Yes"), labels = c("No", "Sí"))
+
+# Verificamos los nuevos nombres
 head(datos)
 ```
 
+b.  Resumen descriptivo univariado (además de realizar el resumen descriptivo, explicar por qué se hace)
 
-b. Resumen descriptivo univariado (además de realizar el resumen descriptivo,
-explicar por qué se hace)
+El análisis univariado es el primer paso esencial para entender la distribución, tendencia central y dispersión de cada variable por separado. Nos permite identificar valores atípicos (outliers), errores de digitación o desequilibrios en las categorías (por ejemplo, si hay muy pocos estudiantes que "No" usan IA), lo cual podría afectar la validez del modelo de regresión posterior.
 
-c. Resumen descriptivo bivariado (además de realizar el resumen descriptivo, explicar
-por qué se hace)
+c.  Resumen descriptivo bivariado (además de realizar el resumen descriptivo, explicar por qué se hace)
+
+Se realiza para explorar preliminarmente la relación entre la variable respuesta ($Y$) y cada predictor ($X$). En regresión lineal, buscamos identificar visualmente si existe una tendencia lineal, la fuerza de la asociación y si la variable cualitativa (uses_ai) desplaza de manera evidente el promedio de las calificaciones. Esto justifica la inclusión de estas variables en el modelo final.
 
 ## Modelamiento
 
-\[
-Y_i = \beta_0 + \beta_1 X_{1i} + \beta_2 X_{2i} + \beta_3 X_{3i} + \varepsilon_i
-\]
+a. Formulación del modelo
 
-donde:
-\[
-Y_i = \text{grades_after_ai}, \quad
-X_{1i} = \text{study_hours_per_day}, \quad
-X_{2i} = \text{uses_ai}, \quad
-X_{3i} = \text{grades_before_ai}.
-\]
+$$
+Y_i = \beta_0 + \beta_1 X_{1} + \beta_2 X_{2} + \beta_3 X_{3} + \varepsilon
+$$ 
 
+Dónde:
+
+- $Y:$ nota despues (Calificación final del estudiante)
+
+- $X_1:$ horas estudio (Horas de estudio diarias)
+
+- $X_2:$ usa ia (Variable dummy: 1 si usa IA, 0 si no usa)
+
+- $X_3:$ nota antes (Calificación previa del estudiante)
+
+- $\beta_0:$ intercepto del modelo
+
+- $\beta_1, \beta_2, \beta_3:$ coeficientes de regresión para cada variable explicativa
+
+- $\epsilon:$ error del modelo
+
+b. Ajuste del modelo
 
 ```{r}
-modelo = lm(grades_after_ai ~ study_hours_per_day + uses_ai + grades_before_ai, data = datos)
-
-summary(modelo)
+modelo = lm(nota_despues ~ horas_estudio + usa_ia + nota_antes, data = datos)
+modelo |> coef()
 ```
 
+c.  Interpretación de los coeficientes de regresión
 
-c. Interpretación de los coeficientes de regresión
-d. Coeficiente de determinación
-e. Verificación del supuesto de normalidad de errores
-f. Verificación del supuesto de homocedasticidad de errores
-g. Verificación del supuesto de independencia de errores
-h. Transformación de datos (si aplica)
-i. Prueba de hipótesis global
-j. Pruebas de hipótesis individuales
-k. Estimación de una media (puntual e intervalar)
-l. Predicción de un nuevo valor (puntual e intervalar)
+$$\hat{Y}= 3.737 + 0.152X_1 + 9.925X_2 + 0.935X_3$$
+
+- 3.737: Es el valor esperado de la nota_despues cuando las horas de estudio, el uso de IA y la nota anterior son cero. En este contexto académico, funciona principalmente como un ajuste matemático del modelo.
+
+- 0.152: Por cada hora adicional de estudio diario, la nota final aumenta en 0.15 puntos.
+
+- 9.925: Los estudiantes que sí usan IA obtienen, en promedio, 9.92 puntos más en su calificación final que aquellos que no la usan, manteniendo constantes las horas de estudio y su nota previa.
+
+- 0.935: Por cada punto adicional que el estudiante tenía en su calificación previa, su nota final aumenta en 0.93 puntos
+
+d.  Coeficiente de determinación
+
+e.  Verificación del supuesto de normalidad de errores
+
+```{r}
+library(broom)
+library(ggplot2)
+
+# Guardamos los residuales en un objeto
+res <- residuals(modelo)
+
+# Gráfico de Normalidad sugerido
+data.frame(res) |>
+  ggplot(aes(x = res)) +
+  geom_histogram(aes(y = ..density..),
+                 bins = round(1 + 3.3 * log10(nrow(datos))),
+                 fill = "dodgerblue2",
+                 alpha = 0.6) +
+  geom_density(size = 1.2, color = "darkblue") +
+  labs(title = "Distribución de Residuales",
+       subtitle = "Histograma con curva de densidad",
+       x = "Residuales",
+       y = "Densidad") +
+  theme_minimal()
+
+```
+En el análisis gráfico de los residuales, se observa una distribución aproximadamente simétrica. Sin embargo, la curva de densidad muestra una forma leptocúrtica (apuntamiento pronunciado), lo que sugiere que los errores están muy concentrados alrededor de la media. 
+
+```{r}
+data.frame(res) |>
+ggplot(aes(sample=res))+
+stat_qq(size = 2) +
+stat_qq_line(distribution = stats::qnorm)+
+labs(x = "Cuantil teórico", y = "Residuales")+
+theme_minimal()
+```
+Al observar el gráfico Q-Q, se aprecia que la mayoría de los residuales se alinean con la diagonal teórica, especialmente en el sector central. No obstante, en los extremos se observa unalejamiento de los puntos, lo cual es coherente con la leptocurtosis detectada en el histograma.
+
+- Coeficiente de asimetría 
+
+$H_0: As = O$
+
+$H_1: As \neq 0$
+
+$\alpha=0.5$
+
+```{r}
+library(moments)
+res |> agostino.test()
+```
+
+Dado que el p-valor (0.4972) es notablemente mayor al nivel de significancia $\alpha = 0.05$, no se rechaza la hipótesis nula ($H_0$). Esto significa que no existe evidencia suficiente para afirmar que los errores son asimétricos. En términos estadísticos, los residuales presentan una simetría aceptable, lo cual es un indicio favorable para el cumplimiento del supuesto de normalidad.
+
+- Curtosis
+
+$H_0: k = 3$
+
+$H_1: k \neq 3$
+
+$\alpha=0.5$
+
+```{r}
+res |> anscombe.test()
+```
+Observamos que el p-valor (0.09991) es mayor que el nivel de significancia. Por lo tanto, no se rechaza la hipótesis nula (los datos son mesocúrticos).
+
+**En conclusión, tras realizar las pruebas de D'Agostino y Anscombe-Glynn, se obtuvieron p-valores de 0.4972 y 0.0999 respectivamente. Dado que ambos son superiores al nivel de significancia $\alpha = 0.05$, no se rechaza la hipótesis nula de simetría ni la de mesocurtosis. Por lo tanto, a pesar de las irregularidades visuales observadas en los gráficos, contamos con evidencia estadística suficiente para asumir el cumplimiento del supuesto de normalidad en los residuales del modelo.**
+
+- Prueba de normalidad
+
+$H_0: los errores siguen una distribucion normal$
+
+$H_1: los errores no siguen una distribucion normal$
+
+```{r}
+res |> shapiro.test()
+```
+"Al realizar la prueba de Shapiro-Wilk, se obtuvo un p-valor de $7.057 \times 10^{-7}$. Al ser menor al nivel de significancia $\alpha = 0.05$, se rechaza la hipótesis nula, concluyendo que los residuales no siguen una distribución normal. Esta falta de normalidad, impulsada por la marcada leptocurtosis observada en el histograma, sugiere que las inferencias del modelo deben tomarse con cautela.
