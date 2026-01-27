@@ -42,7 +42,7 @@ b.  Objetivos de aprendizaje
 
 En la actualidad educativa, el uso de recursos de inteligencia artificial se ha popularizado entre los alumnos como un medio complementario para el aprendizaje y la ejecución de tareas académicas. Sin embargo, hay dudas respecto al verdadero efecto de estas tecnologías en el desempeño académico. Así, el objetivo de este tutorial es examinar cómo el uso de la inteligencia artificial se relaciona con el desempeño académico de los estudiantes, el cual se medirá a través de sus calificaciones posteriores, teniendo en cuenta además aspectos importantes como las horas dedicadas al estudio cada día y el rendimiento académico previo, utilizando un modelo de regresión lineal múltiple.
 
-b.  Origen del dataset: indicar fuente recuperable.
+b.  Origen del dataset: https://www.kaggle.com/datasets/aminasalamt/students-ai-usage-and-academic-performance
 
 ## Definición de variables
 

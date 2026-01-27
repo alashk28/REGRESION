@@ -418,7 +418,7 @@ importantes como las horas dedicadas al estudio cada día y el
 rendimiento académico previo, utilizando un modelo de regresión lineal
 múltiple.</p>
 <ol start="2" style="list-style-type: lower-alpha">
-<li>Origen del dataset: indicar fuente recuperable.</li>
+<li>Origen del dataset: <a href="https://www.kaggle.com/datasets/aminasalamt/students-ai-usage-and-academic-performance" class="uri">https://www.kaggle.com/datasets/aminasalamt/students-ai-usage-and-academic-performance</a></li>
 </ol>
 </div>
 <div id="definición-de-variables" class="section level2">
@@ -1006,16 +1006,16 @@ modelo |&gt;
                    max.lag = 10,
                    reps = 1e5)</code></pre>
 <pre><code>##  lag Autocorrelation D-W Statistic p-value
-##    1   -0.2155056389      2.370510 0.06376
-##    2    0.1300585592      1.613377 0.06578
-##    3   -0.0399744913      1.919083 0.85972
-##    4   -0.0195435120      1.877249 0.76252
-##    5   -0.1378895450      2.113701 0.33672
-##    6   -0.0116585487      1.860884 0.87264
-##    7   -0.0555569733      1.923065 0.81980
-##    8   -0.0459027999      1.894279 0.84680
-##    9    0.0007482973      1.770341 0.74294
-##   10    0.0203025993      1.730896 0.67568
+##    1   -0.2155056389      2.370510 0.06214
+##    2    0.1300585592      1.613377 0.06392
+##    3   -0.0399744913      1.919083 0.86486
+##    4   -0.0195435120      1.877249 0.75810
+##    5   -0.1378895450      2.113701 0.33750
+##    6   -0.0116585487      1.860884 0.87364
+##    7   -0.0555569733      1.923065 0.82488
+##    8   -0.0459027999      1.894279 0.84678
+##    9    0.0007482973      1.770341 0.73942
+##   10    0.0203025993      1.730896 0.66856
 ##  Alternative hypothesis: rho[lag] != 0</code></pre>
 <p>Si bien los p-valores de la prueba de Durbin-Watson para todos los
 retardos son superiores a 0.05, lo que técnicamente valida la
