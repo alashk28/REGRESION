@@ -100,9 +100,152 @@ b.  Resumen descriptivo univariado (además de realizar el resumen descriptivo, 
 
 El análisis univariado es el primer paso esencial para entender la distribución, tendencia central y dispersión de cada variable por separado. Nos permite identificar valores atípicos (outliers), errores de digitación o desequilibrios en las categorías (por ejemplo, si hay muy pocos estudiantes que "No" usan IA), lo cual podría afectar la validez del modelo de regresión posterior.
 
+```{r}
+summary(datos$nota_despues)
+sd(datos$nota_despues)
+hist(datos$nota_despues,
+     col = "skyblue",
+     main = "Distribución de la nota después",
+       xlab = "Nota final")
+```
+
+Variable dependiente: nota_despues
+
+La calificación final de los estudiantes presenta:
+
+Media: 68.7
+
+Mediana: 69
+
+Mínimo – Máximo: 55 a 89
+
+Desviación estándar: 8.14
+
+Esto indica que las notas finales se concentran alrededor de 69 puntos, con una dispersión moderada. Ademas permite ver cómo se distribuyen las calificaciones finales, si están concentradas en un rango específico y si la forma es aproximadamente simétrica.
+
+```{r}
+summary(datos$horas_estudio)
+sd(datos$horas_estudio)
+hist(datos$horas_estudio,
+     col = "lightgreen",
+     main = "Distribución de horas de estudio por día",
+     xlab = "Horas de estudio")
+```
+
+Variable independiente: horas_estudio
+
+Las horas de estudio diarias muestran:
+
+Media: 2.99 horas
+
+Mediana: 2.8 horas
+
+Rango: 1 a 5 horas
+
+Desviación estándar: 1.15
+
+Los estudiantes estudian en promedio aproximadamente 3 horas al día. La dispersión es baja a moderada, lo que indica que la mayoría de estudiantes se concentra en un rango similar de tiempo de estudio, sin diferencias excesivas entre ellos.
+
+```{r}
+summary(datos$nota_antes)
+sd(datos$nota_antes)
+hist(datos$nota_antes,
+     col = "salmon",
+     main = "Distribución de la nota antes",
+     xlab = "Nota previa")
+```
+
+El rendimiento previo presenta:
+
+Media: 64.77
+
+Mediana: 63
+
+Rango: 55 a 75
+
+Desviación estándar: 6.17
+
+Las calificaciones antes del uso de IA son ligeramente menores que las finales, lo que podría anticipar una mejora general en el desempeño. La variabilidad es moderada, lo que permite que esta variable aporte información relevante al modelo.
+
+```{r}
+table(datos$usa_ia)
+prop.table(table(datos$usa_ia))
+barplot(table(datos$usa_ia),
+        col = c("gray70", "steelblue"),
+        main = "Uso de herramientas de IA",
+        ylab = "Frecuencia")
+```
+
+Variable independiente categórica: usa_ia
+
+La distribución del uso de inteligencia artificial es:
+
+No usa IA: 60 estudiantes (60%)
+
+Sí usa IA: 40 estudiantes (40%)
+
+Las proporciones son relativamente equilibradas, lo cual es adecuado para el análisis, ya que ambos grupos tienen tamaños suficientes para comparar sus efectos en el modelo sin generar inestabilidad estadística.
+
 c.  Resumen descriptivo bivariado (además de realizar el resumen descriptivo, explicar por qué se hace)
 
 Se realiza para explorar preliminarmente la relación entre la variable respuesta ($Y$) y cada predictor ($X$). En regresión lineal, buscamos identificar visualmente si existe una tendencia lineal, la fuerza de la asociación y si la variable cualitativa (uses_ai) desplaza de manera evidente el promedio de las calificaciones. Esto justifica la inclusión de estas variables en el modelo final.
+
+1)  Horas de estudio vs Nota despues
+
+```{r}
+plot(datos$horas_estudio, datos$nota_despues,
+     col = "darkgreen",
+     pch = 16,
+     xlab = "Horas de estudio por día",
+     ylab = "Nota después",
+     main = "Relación entre horas de estudio y nota final")
+
+abline(lm(nota_despues ~ horas_estudio, data = datos), col = "red", lwd = 2)
+cor(datos$horas_estudio, datos$nota_despues)
+```
+
+El diagrama de dispersión muestra la relación entre las horas de estudio diarias y la calificación final obtenida por los estudiantes. Visualmente, los puntos aparecen bastante dispersos y no se observa una tendencia lineal fuerte. La línea de regresión (en rojo) tiene una pendiente levemente positiva, pero muy pequeña. El coeficiente de correlación calculado es 0.075 el cual valor es muy cercano a 0, lo que indica una relación lineal positiva extremadamente débil entre las horas de estudio y la nota final. En términos prácticos, esto sugiere que, en este conjunto de datos, aumentar las horas de estudio no está fuertemente asociado con un incremento notable en la calificación después del uso de IA.
+
+2)  Nota antes vs Nota despues
+
+```{r}
+plot(datos$nota_antes, datos$nota_despues,
+     col = "purple",
+     pch = 16,
+     xlab = "Nota antes",
+     ylab = "Nota después",
+     main = "Relación entre nota previa y nota final")
+
+abline(lm(nota_despues ~ nota_antes, data = datos), col = "red", lwd = 2)
+cor(datos$nota_antes, datos$nota_despues)
+```
+
+El diagrama de dispersión muestra una tendencia lineal positiva bien definida entre la calificación previa del estudiante y su calificación final. A medida que aumenta la nota antes, también aumenta la nota después. La línea de regresión (en rojo) refleja claramente esta pendiente ascendente. El coeficiente de correlación obtenido es 0.756 el cual indica una correlación lineal positiva fuerte. En términos prácticos, significa que los estudiantes que ya tenían un buen rendimiento académico tienden a mantener ese buen desempeño posteriormente.
+
+3)  Uso de IA vs Nota despues
+
+```{r}
+boxplot(nota_despues ~ usa_ia, data = datos,
+        col = c("gray80", "skyblue"),
+        xlab = "Uso de IA",
+        ylab = "Nota después",
+        main = "Nota final según uso de IA")
+
+tapply(datos$nota_despues, datos$usa_ia, mean)
+
+```
+
+El diagrama de cajas permite comparar la distribución de las calificaciones finales entre los estudiantes que usan IA y los que no la usan.
+
+Se observa que:
+
+La mediana de las notas finales es claramente mayor en el grupo que sí usa IA.
+
+La mayor parte de las calificaciones del grupo “Sí” se concentra en valores más altos que las del grupo “No”.
+
+Aunque existe cierta variabilidad en ambos grupos, la distribución completa del grupo que usa IA está desplazada hacia arriba.
+
+Esto indica que, de manera descriptiva, los estudiantes que utilizan herramientas de inteligencia artificial tienden a obtener mejores calificaciones finales en comparación con aquellos que no las utilizan.
 
 ## Modelamiento
 
@@ -148,6 +291,20 @@ $$\hat{Y}= 3.737 + 0.152X_1 + 9.925X_2 + 0.935X_3$$
 - 0.935: Por cada punto adicional que el estudiante tenía en su calificación previa, su nota final aumenta en 0.93 puntos
 
 d.  Coeficiente de determinación
+
+El coeficiente de determinación $R^2$ mide qué proporción de la variabilidad de la variable dependiente (nota_despues) es explicada por el conjunto de variables independientes incluidas en el modelo: horas de estudio, uso de IA y nota previa.
+
+```{r}
+summary(modelo)$r.squared
+```
+
+Esto indica que aproximadamente el 92.8% de la variación en las calificaciones finales de los estudiantes puede ser explicada por las variables del modelo. Este es un valor muy alto, lo que sugiere que el modelo tiene un gran poder explicativo.
+
+```{r}
+summary(modelo)$adj.r.squared
+```
+
+El coeficiente de determinación ajustado fue: $R^2_{ajustado}$ = 92.5% Este valor es muy cercano al $R^2$, lo que indica que las variables incluidas son relevantes y que el modelo no está sobreajustado. Es decir, cada variable aporta información útil para explicar el rendimiento académico final.
 
 e.  Verificación del supuesto de normalidad de errores
 
@@ -217,11 +374,129 @@ Observamos que el p-valor (0.09991) es mayor que el nivel de significancia. Por 
 
 - Prueba de normalidad
 
-$H_0: los errores siguen una distribucion normal$
+$H_0:$ los errores siguen una distribucion normal
 
-$H_1: los errores no siguen una distribucion normal$
+$H_1:$ los errores no siguen una distribucion normal
 
 ```{r}
 res |> shapiro.test()
 ```
 "Al realizar la prueba de Shapiro-Wilk, se obtuvo un p-valor de $7.057 \times 10^{-7}$. Al ser menor al nivel de significancia $\alpha = 0.05$, se rechaza la hipótesis nula, concluyendo que los residuales no siguen una distribución normal. Esta falta de normalidad, impulsada por la marcada leptocurtosis observada en el histograma, sugiere que las inferencias del modelo deben tomarse con cautela.
+
+f. Verificación del supuesto de homocedasticidad de errores 
+
+```{r}
+modelo |> plot(which=1)
+```
+
+En la primera imagen, se observa que a medida que los valores ajustados aumentan (hacia la derecha en el eje X), la dispersión de los puntos se vuelve mucho mayor. Los puntos no forman una "banda horizontal" uniforme, sino que parecen abrirse en forma de embudo o abanico.
+
+```{r}
+modelo |> plot(which=3)
+```
+
+En la segunda imagen, la línea roja tiene una tendencia ascendente marcada. Esto confirma que la magnitud de los residuos (la variabilidad) está creciendo junto con los valores predichos.
+
+Ambos gráficos sugieren la presencia de heterocedasticidad (varianza no constante). Esto indica que el modelo es más preciso para predecir notas bajas que para predecir notas altas.
+
+```{r}
+library(broom)
+library(ggplot2)
+
+# Usamos augment() para obtener los valores ajustados (.fitted) y los residuales (.resid)
+modelo |> 
+  augment() |> 
+  ggplot(aes(x = .fitted, y = .resid)) +
+  geom_point(size = 3, color = "steelblue", alpha = 0.7) +
+  geom_hline(yintercept = 0, color = "red", linetype = "dashed") +
+  labs(x = "Valores ajustados (Puntaje de diagnóstico)",
+       y = "Residual",
+       title = "Evaluación de homocedasticidad",
+       subtitle = "Modelo: Desempeño académico con IA") +
+  theme_minimal()
+```
+
+Existe heterocedasticidad. Visualmente, el gráfico tiene forma de "abanico" o "embudo". Esto nos dice que, aunque el modelo capta la tendencia general, hay factores adicionales que afectan a los alumnos destacados que no estamos logrando explicar solo con las horas de estudio o el uso de IA.
+
+```{r}
+# Usamos el modelo y la variable 'horas_estudio'
+modelo |> augment() |>
+  ggplot(aes(x = horas_estudio, y = .resid)) +
+  geom_point(size = 3, color = "darkorange", alpha = 0.7) +
+  geom_hline(yintercept = 0, color = "black", linetype = "solid") +
+  labs(x = "Horas de estudio",
+       y = "Residual",
+       title = "Evaluación de homocedasticidad por variable",
+       subtitle = "Relación: Horas de estudio vs Residuales") +
+  theme_minimal()
+```
+
+Aunque el modelo identifica una tendencia, la heterocedasticidad detectada en la variable 'horas de estudio' sugiere que el impacto del estudio en la nota final es muy variable entre los alumnos destacados. Esto indica que nuestro modelo es útil, pero sus predicciones deben tomarse con cautela en el rango de alto rendimiento académico.
+
+$H_0$: La varianza de los errores son constantes
+
+$H_1$: La varianza de los errores no son constantes
+
+$\alpha = 0.05$
+
+```{r}
+library(car)
+```
+
+```{r}
+modelo |> ncvTest()
+```
+
+Se rechaza la hipotesis nula, por lo tanto no se verifica el supuesto de homogeneidad de varianza de los errores
+
+g. Verificación del supuesto de independencia de errores 
+
+```{r}
+# Usamos los residuales de tu modelo (res) y el total de datos
+data.frame(res) |>
+  ggplot(aes(x = 1:nrow(datos), y = res)) +
+  geom_point(size = 1.5, color = "darkgreen") +
+  geom_line(alpha = 0.3) +
+  geom_hline(yintercept = 0, color = "red", linetype = "dashed") +
+  labs(x = "Orden de observación", 
+       y = "Residual", 
+       title = "Evaluación de independencia",
+       subtitle = "Gráfico de secuencia de residuos") +
+  theme_minimal()
+```
+
+El gráfico de secuencia de residuos no muestra patrones sistemáticos, lo que indica que las observaciones son independientes entre sí.
+
+```{r}
+library(ggfortify)
+```
+
+```{r}
+# Usamos los residuales de tu modelo
+res |> 
+  TSA::acf(lag = 18, plot = F) |> 
+  autoplot() + 
+  labs(x = "Desfase (Lag)", 
+       y = "Autocorrelación", 
+       title = "Evaluación de independencia (ACF)",
+       subtitle = "Gráfico de Autocorrelación de los Residuales") + 
+  theme_minimal()
+```
+
+Todas las autocorrelaciones son estadísticamente iguales a cero (están dentro de los límites azules de confianza), lo que evidenciaría el cumplimiento del supuesto de independencia de errores.
+
+$H_0$: Los errores son independientes
+
+$H_1$: Los errores no son independientes
+
+$\alpha = 0.05$
+
+```{r}
+library(car)
+modelo |> 
+  durbinWatsonTest(alternative = "two.sided",
+                   max.lag = 10,
+                   reps = 1e5)
+```
+
+Si bien los p-valores de la prueba de Durbin-Watson para todos los retardos son superiores a 0.05, lo que técnicamente valida la independencia, se recomienda observar con cautela el comportamiento de los residuales cada 8 observaciones. Se ha detectado una ligera autocorrelación en el desfase (lag) 8 que, aunque no llega a invalidar el modelo, sugiere la existencia de un patrón menor en la recolección de datos. Fuera de esta observación puntual, no existe evidencia de falta de independencia en el resto de la estructura del modelo.
