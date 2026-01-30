@@ -352,7 +352,7 @@ $H_0: As = 0$
 
 $H_1: As \neq 0$
 
-$\alpha=0.5$
+$\alpha=0.05$
 
 ```{r}
 res |> agostino.test()
@@ -366,7 +366,7 @@ $H_0: k = 3$
 
 $H_1: k \neq 3$
 
-$\alpha=0.5$
+$\alpha=0.05$
 
 ```{r}
 res |> anscombe.test()
@@ -380,6 +380,8 @@ Observamos que el p-valor (0.09991) es mayor que el nivel de significancia. Por 
 $H_0:$ los errores siguen una distribucion normal
 
 $H_1:$ los errores no siguen una distribucion normal
+
+$\alpha=0.05$
 
 ```{r}
 res |> shapiro.test()
@@ -502,3 +504,4 @@ modelo |>
 
 
 Si bien los p-valores de la prueba de Durbin-Watson para todos los retardos son superiores a 0.05, lo que técnicamente valida la independencia, se recomienda observar con cautela el comportamiento de los residuales cada 8 observaciones. Se ha detectado una ligera autocorrelación en el desfase (lag) 8 que, aunque no llega a invalidar el modelo, sugiere la existencia de un patrón menor en la recolección de datos. Fuera de esta observación puntual, no existe evidencia de falta de independencia en el resto de la estructura del modelo.
+
