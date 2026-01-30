@@ -71,6 +71,9 @@ b.  Origen del dataset: https://www.kaggle.com/datasets/aminasalamt/students-ai-
 # Cargar librerías
 library(dplyr)
 ```
+
+##### Impotación de datos
+
 ```{r}
 # Lecutra del dataset
 datos = read.csv("students_ai_usage.csv")
@@ -96,7 +99,7 @@ datos$usa_ia <- factor(datos$usa_ia, levels = c("No", "Yes"), labels = c("No", "
 head(datos)
 ```
 
-b.  Resumen descriptivo univariado (además de realizar el resumen descriptivo, explicar por qué se hace)
+##### Resumen descriptivo univariado
 
 El análisis univariado es el primer paso esencial para entender la distribución, tendencia central y dispersión de cada variable por separado. Nos permite identificar valores atípicos (outliers), errores de digitación o desequilibrios en las categorías (por ejemplo, si hay muy pocos estudiantes que "No" usan IA), lo cual podría afectar la validez del modelo de regresión posterior.
 
@@ -154,7 +157,7 @@ hist(datos$nota_antes,
      main = "Distribución de la nota antes",
      xlab = "Nota previa")
 ```
-- Variable independiente: notas_antes
+- Variable independiente: nota_antes
 
 El rendimiento previo presenta:
 
@@ -187,11 +190,11 @@ La distribución del uso de inteligencia artificial es:
 
 Las proporciones son relativamente equilibradas, lo cual es adecuado para el análisis, ya que ambos grupos tienen tamaños suficientes para comparar sus efectos en el modelo sin generar inestabilidad estadística.
 
-c.  Resumen descriptivo bivariado (además de realizar el resumen descriptivo, explicar por qué se hace)
+##### Resumen descriptivo bivariado
 
 Se realiza para explorar preliminarmente la relación entre la variable respuesta ($Y$) y cada predictor ($X$). En regresión lineal, buscamos identificar visualmente si existe una tendencia lineal, la fuerza de la asociación y si la variable cualitativa (uses_ai) desplaza de manera evidente el promedio de las calificaciones. Esto justifica la inclusión de estas variables en el modelo final.
 
-1)  Horas de estudio vs Nota despues
+1)  Horas de estudio vs Nota después
 
 ```{r}
 plot(datos$horas_estudio, datos$nota_despues,
@@ -207,7 +210,7 @@ cor(datos$horas_estudio, datos$nota_despues)
 
 El diagrama de dispersión muestra la relación entre las horas de estudio diarias y la calificación final obtenida por los estudiantes. Visualmente, los puntos aparecen bastante dispersos y no se observa una tendencia lineal fuerte. La línea de regresión (en rojo) tiene una pendiente levemente positiva, pero muy pequeña. El coeficiente de correlación calculado es 0.075 el cual valor es muy cercano a 0, lo que indica una relación lineal positiva extremadamente débil entre las horas de estudio y la nota final. En términos prácticos, esto sugiere que, en este conjunto de datos, aumentar las horas de estudio no está fuertemente asociado con un incremento notable en la calificación después del uso de IA.
 
-2)  Nota antes vs Nota despues
+2)  Nota antes vs Nota después
 
 ```{r}
 plot(datos$nota_antes, datos$nota_despues,
@@ -248,9 +251,11 @@ Aunque existe cierta variabilidad en ambos grupos, la distribución completa del
 
 Esto indica que, de manera descriptiva, los estudiantes que utilizan herramientas de inteligencia artificial tienden a obtener mejores calificaciones finales en comparación con aquellos que no las utilizan.
 
+- Resumen: En conjunto, el análisis exploratorio bivariado respalda la inclusión de las variables horas de estudio, uso de IA y nota previa en el modelo de regresión lineal múltiple, al evidenciar distintos patrones de asociación con la calificación final.
+
 ## Modelamiento
 
-a. Formulación del modelo
+#### Formulación del modelo
 
 $$
 Y_i = \beta_0 + \beta_1 X_{1} + \beta_2 X_{2} + \beta_3 X_{3} + \varepsilon
@@ -272,14 +277,14 @@ Dónde:
 
 - $\epsilon:$ error del modelo
 
-b. Ajuste del modelo
+#### Ajuste del modelo
 
 ```{r}
 modelo = lm(nota_despues ~ horas_estudio + usa_ia + nota_antes, data = datos)
 modelo |> coef()
 ```
 
-c.  Interpretación de los coeficientes de regresión
+#### Interpretación de los coeficientes de regresión
 
 $$\hat{Y}= 3.737 + 0.152X_1 + 9.925X_2 + 0.935X_3$$
 
@@ -291,7 +296,7 @@ $$\hat{Y}= 3.737 + 0.152X_1 + 9.925X_2 + 0.935X_3$$
 
 - 0.935: Por cada punto adicional que el estudiante tenía en su calificación previa, su nota final aumenta en 0.93 puntos
 
-d.  Coeficiente de determinación y coeficiente de determinación ajustado
+#### Coeficiente de determinación y coeficiente de determinación ajustado
 
 El coeficiente de determinación $R^2$ mide qué proporción de la variabilidad de la variable dependiente (nota_despues) es explicada por el conjunto de variables independientes incluidas en el modelo: horas de estudio, uso de IA y nota previa.
 
@@ -307,7 +312,7 @@ summary(modelo)$adj.r.squared
 
 El coeficiente de determinación ajustado fue: $R^2_{ajustado}$ = 92.5% Este valor es muy cercano al $R^2$, lo que indica que las variables incluidas son relevantes y que el modelo no está sobreajustado. Es decir, cada variable aporta información útil para explicar el rendimiento académico final.
 
-e.  Verificación del supuesto de normalidad de errores
+#### Verificación del supuesto de normalidad de errores
 
 ```{r setup2, include=FALSE}
 library(broom)
@@ -386,9 +391,15 @@ $\alpha=0.05$
 ```{r}
 res |> shapiro.test()
 ```
-"Al realizar la prueba de Shapiro-Wilk, se obtuvo un p-valor de $7.057 \times 10^{-7}$. Al ser menor al nivel de significancia $\alpha = 0.05$, se rechaza la hipótesis nula, concluyendo que los residuales no siguen una distribución normal. Esta falta de normalidad, impulsada por la marcada leptocurtosis observada en el histograma, sugiere que las inferencias del modelo deben tomarse con cautela.
+Al realizar la prueba de Shapiro-Wilk, se obtuvo un p-valor de $7.057 \times 10^{-7}$. Al ser menor al nivel de significancia $\alpha = 0.05$, se rechaza la hipótesis nula, concluyendo que los residuales no siguen una distribución normal. Esta falta de normalidad, impulsada por la marcada leptocurtosis observada en el histograma, sugiere que las inferencias del modelo deben tomarse con cautela.
 
-f. Verificación del supuesto de homocedasticidad de errores 
+
+**TOMAR EN CUENTA**
+
+-   Aunque las pruebas de *asimetría y curtosis* no rechazan la hipótesis de normalidad, la *prueba de Shapiro-Wilk* resulta muy sensible al tamaño muestral, detectando desviaciones de la normalidad. Dado que el tamaño de muestra es moderado, esta discrepancia es esperable. En consecuencia, el supuesto de normalidad se PODRÍA cumplir de manera [*aproximada*]{.underline}, permitiendo continuar con la inferencia bajo el modelo lineal, aunque con cautela en los extremos de la distribución.
+
+
+#### Verificación del supuesto de homocedasticidad de errores 
 
 ```{r}
 modelo |> plot(which=1)
@@ -451,7 +462,7 @@ modelo |> ncvTest()
 
 Se rechaza la hipotesis nula, por lo tanto no se verifica el supuesto de homogeneidad de varianza de los errores
 
-g. Verificación del supuesto de independencia de errores 
+#### Verificación del supuesto de independencia de errores 
 
 ```{r}
 # Usamos los residuales de tu modelo (res) y el total de datos
@@ -504,4 +515,53 @@ modelo |>
 
 
 Si bien los p-valores de la prueba de Durbin-Watson para todos los retardos son superiores a 0.05, lo que técnicamente valida la independencia, se recomienda observar con cautela el comportamiento de los residuales cada 8 observaciones. Se ha detectado una ligera autocorrelación en el desfase (lag) 8 que, aunque no llega a invalidar el modelo, sugiere la existencia de un patrón menor en la recolección de datos. Fuera de esta observación puntual, no existe evidencia de falta de independencia en el resto de la estructura del modelo.
+
+#### Transformación de datos
+
+En la evaluación de los supuestos del modelo se identificó la presencia de heterocedasticidad en los errores. Una alternativa habitual para abordar este problema consiste en aplicar transformaciones a la variable respuesta, como la transformación logarítmica o Box-Cox, con el objetivo de estabilizar la varianza.
+
+![](https://miro.medium.com/v2/resize:fit:1400/1*7JIZgIWioZxXYiOqJVujXA.png)
+
+No obstante, dado que la variable dependiente corresponde a calificaciones académicas medidas en una escala acotada y de interpretación directa, se decidió mantener el modelo en su forma original. En consecuencia, los resultados inferenciales se presentan con una nota de precaución, reconociendo la presencia de heterocedasticidad.
+
+[*Este modelo se presenta únicamente con fines ilustrativos.*]{.underline}
+
+Con el objetivo de evaluar una posible solución a la heterocedasticidad detectada, se estimó un modelo alternativo aplicando una transformación logarítmica a la variable dependiente.
+
+```{r}
+modelo_log <- lm(log(nota_despues) ~ horas_estudio + usa_ia + nota_antes, data = datos)
+summary(modelo_log)
+```
+
+Los resultados muestran un alto poder explicativo ($R^2 = 0.931$) y coeficientes estadísticamente significativos para el uso de IA y la nota previa. Sin embargo, la interpretación de los coeficientes se realiza en términos porcentuales, lo cual dificulta su lectura en el contexto de calificaciones académicas.
+
+Por esta razón, este modelo se presenta únicamente con fines educativos, manteniéndose como modelo principal el estimado sobre la escala original de las calificaciones, acompañado de una nota de precaución respecto a la heterocedasticidad.
+
+
+#### Prueba de hipótesis global del modelo
+
+Se evalúa la significancia global del modelo de regresión lineal múltiple mediante el estadístico F, con el objetivo de determinar si el conjunto de variables explicativas aporta información relevante para explicar la calificación posterior al uso de IA.
+
+Las hipótesis planteadas son:
+
+$$
+H_0:\ \beta_1 = \beta_2 = \beta_3 = 0
+$$
+
+$$
+H_1:\ \text{Al menos uno de los coeficientes } \beta_j \neq 0
+$$
+
+Prueba global del modelo (estadístico F): 
+
+```{r}
+
+summary(modelo)
+anova(modelo)
+
+```
+
+Dado que el p-valor asociado al estadístico F es menor al nivel de significancia $\alpha = 0.05$, se rechaza la hipótesis nula. Por lo tanto, el modelo es globalmente significativo y las variables explicativas contribuyen conjuntamente a explicar la variabilidad de la calificación posterior al uso de IA.
+
+**Nota de precaución:** Esta conclusión se realiza bajo el supuesto de cumplimiento de los supuestos clásicos del modelo de regresión lineal. En presencia de posibles desviaciones, los resultados deben interpretarse con cautela.
 
