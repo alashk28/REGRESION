@@ -72,10 +72,10 @@ b.  Origen del dataset: https://www.kaggle.com/datasets/aminasalamt/students-ai-
 library(dplyr)
 ```
 
-##### Impotación de datos
+##### Importación de datos
 
 ```{r}
-# Lecutra del dataset
+# Lectura del dataset
 datos = read.csv("students_ai_usage.csv")
 
 # Renombrar columnas para un mejor manejo
@@ -124,7 +124,7 @@ La calificación final de los estudiantes presenta:
 
 - Desviación estándar: 8.14
 
-Esto indica que las notas finales se concentran alrededor de 69 puntos, con una dispersión moderada. Ademas permite ver cómo se distribuyen las calificaciones finales, si están concentradas en un rango específico y si la forma es aproximadamente simétrica.
+Esto indica que las notas finales se concentran alrededor de 69 puntos, con una dispersión moderada. Además permite ver cómo se distribuyen las calificaciones finales, si están concentradas en un rango específico y si la forma es aproximadamente simétrica.
 
 ```{r}
 summary(datos$horas_estudio)
@@ -208,7 +208,7 @@ abline(lm(nota_despues ~ horas_estudio, data = datos), col = "red", lwd = 2)
 cor(datos$horas_estudio, datos$nota_despues)
 ```
 
-El diagrama de dispersión muestra la relación entre las horas de estudio diarias y la calificación final obtenida por los estudiantes. Visualmente, los puntos aparecen bastante dispersos y no se observa una tendencia lineal fuerte. La línea de regresión (en rojo) tiene una pendiente levemente positiva, pero muy pequeña. El coeficiente de correlación calculado es 0.075 el cual valor es muy cercano a 0, lo que indica una relación lineal positiva extremadamente débil entre las horas de estudio y la nota final. En términos prácticos, esto sugiere que, en este conjunto de datos, aumentar las horas de estudio no está fuertemente asociado con un incremento notable en la calificación después del uso de IA.
+El diagrama de dispersión muestra la relación entre las horas de estudio diarias y la calificación final obtenida por los estudiantes. Visualmente, los puntos aparecen bastante dispersos y no se observa una tendencia lineal fuerte. La línea de regresión (en rojo) tiene una pendiente levemente positiva, pero muy pequeña. El coeficiente de correlación calculado es 0.075 el cual es muy cercano a 0, lo que indica una relación lineal positiva extremadamente débil entre las horas de estudio y la nota final. En términos prácticos, esto sugiere que, en este conjunto de datos, aumentar las horas de estudio no está fuertemente asociado con un incremento notable en la calificación después del uso de IA.
 
 2)  Nota antes vs Nota después
 
@@ -226,7 +226,7 @@ cor(datos$nota_antes, datos$nota_despues)
 
 El diagrama de dispersión muestra una tendencia lineal positiva bien definida entre la calificación previa del estudiante y su calificación final. A medida que aumenta la nota antes, también aumenta la nota después. La línea de regresión (en rojo) refleja claramente esta pendiente ascendente. El coeficiente de correlación obtenido es 0.756 el cual indica una correlación lineal positiva fuerte. En términos prácticos, significa que los estudiantes que ya tenían un buen rendimiento académico tienden a mantener ese buen desempeño posteriormente.
 
-3)  Uso de IA vs Nota despues
+3)  Uso de IA vs Nota después
 
 ```{r}
 boxplot(nota_despues ~ usa_ia, data = datos,
@@ -555,13 +555,48 @@ $$
 Prueba global del modelo (estadístico F): 
 
 ```{r}
-
-summary(modelo)
+# Resumen del modelo para pruebas globales
 anova(modelo)
-
 ```
 
 Dado que el p-valor asociado al estadístico F es menor al nivel de significancia $\alpha = 0.05$, se rechaza la hipótesis nula. Por lo tanto, el modelo es globalmente significativo y las variables explicativas contribuyen conjuntamente a explicar la variabilidad de la calificación posterior al uso de IA.
 
 **Nota de precaución:** Esta conclusión se realiza bajo el supuesto de cumplimiento de los supuestos clásicos del modelo de regresión lineal. En presencia de posibles desviaciones, los resultados deben interpretarse con cautela.
+
+#### Pruebas de hipótesis individuales (significancia de los coeficientes)
+
+Una vez verificada la significancia global del modelo, se procede a evaluar la significancia individual de cada coeficiente de regresión mediante la prueba *t* de Student. Estas pruebas permiten determinar si cada variable explicativa tiene un efecto estadísticamente significativo sobre la calificación posterior al uso de IA, manteniendo constantes las demás variables del modelo.
+
+Las hipótesis planteadas para cada coeficiente $\beta_j$ son:
+
+$$
+H_0:\ \beta_j = 0
+$$
+
+$$
+H_1:\ \beta_j \neq 0
+$$
+
+```{r}
+# Resumen del modelo para pruebas individuales
+summary(modelo)
+
+```
+
+A partir de los resultados obtenidos, se observa lo siguiente:
+
+- **Horas de estudio por día (`horas_estudio`)**:  
+  El coeficiente asociado no resulta estadísticamente significativo (valor p > 0.05), lo que indica que, controlando por el uso de IA y la calificación previa, las horas de estudio no presentan un efecto significativo sobre la calificación final.
+
+- **Uso de inteligencia artificial (`usa_ia`)**:  
+  El coeficiente asociado a esta variable es estadísticamente significativo (valor p < 0.05) y positivo, lo que sugiere que los estudiantes que utilizan herramientas de inteligencia artificial tienden a obtener, en promedio, una calificación final mayor que aquellos que no las utilizan, manteniendo constantes las demás variables.
+
+- **Calificación previa (`nota_antes`)**:  
+  El coeficiente correspondiente es estadísticamente significativo (valor p < 0.05) y positivo, indicando que un mayor rendimiento académico previo se asocia con una mayor calificación posterior.
+
+**En conjunto, las pruebas individuales confirman que el uso de IA y la calificación previa son variables relevantes para explicar el rendimiento académico posterior, mientras que las horas de estudio no muestran un efecto significativo en este modelo específico.**
+
+**Nota de precaución:** Las pruebas de significancia individuales se interpretan bajo el supuesto de cumplimiento de los supuestos clásicos del modelo de regresión lineal. En caso de desviaciones, los resultados deben analizarse con cautela, especialmente en lo referente a la inferencia estadística.
+
+
 
