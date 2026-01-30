@@ -67,11 +67,11 @@ b.  Origen del dataset: https://www.kaggle.com/datasets/aminasalamt/students-ai-
 - **Descripción:** Calificación obtenida por el estudiante antes del uso de herramientas de inteligencia artificial.
 
 ## Exploración de datos
-
-```{r}
+```{r setup, include=FALSE}
 # Cargar librerías
 library(dplyr)
-
+```
+```{r}
 # Lecutra del dataset
 datos = read.csv("students_ai_usage.csv")
 
@@ -109,17 +109,17 @@ hist(datos$nota_despues,
        xlab = "Nota final")
 ```
 
-Variable dependiente: nota_despues
+- Variable dependiente: nota_despues
 
 La calificación final de los estudiantes presenta:
 
-Media: 68.7
+- Media: 68.7
 
-Mediana: 69
+- Mediana: 69
 
-Mínimo – Máximo: 55 a 89
+- Mínimo – Máximo: 55 a 89
 
-Desviación estándar: 8.14
+- Desviación estándar: 8.14
 
 Esto indica que las notas finales se concentran alrededor de 69 puntos, con una dispersión moderada. Ademas permite ver cómo se distribuyen las calificaciones finales, si están concentradas en un rango específico y si la forma es aproximadamente simétrica.
 
@@ -132,17 +132,17 @@ hist(datos$horas_estudio,
      xlab = "Horas de estudio")
 ```
 
-Variable independiente: horas_estudio
+- Variable independiente: horas_estudio
 
 Las horas de estudio diarias muestran:
 
-Media: 2.99 horas
+- Media: 2.99 horas
 
-Mediana: 2.8 horas
+- Mediana: 2.8 horas
 
-Rango: 1 a 5 horas
+- Rango: 1 a 5 horas
 
-Desviación estándar: 1.15
+- Desviación estándar: 1.15
 
 Los estudiantes estudian en promedio aproximadamente 3 horas al día. La dispersión es baja a moderada, lo que indica que la mayoría de estudiantes se concentra en un rango similar de tiempo de estudio, sin diferencias excesivas entre ellos.
 
@@ -154,16 +154,17 @@ hist(datos$nota_antes,
      main = "Distribución de la nota antes",
      xlab = "Nota previa")
 ```
+- Variable independiente: notas_antes
 
 El rendimiento previo presenta:
 
-Media: 64.77
+- Media: 64.77
 
-Mediana: 63
+- Mediana: 63
 
-Rango: 55 a 75
+- Rango: 55 a 75
 
-Desviación estándar: 6.17
+- Desviación estándar: 6.17
 
 Las calificaciones antes del uso de IA son ligeramente menores que las finales, lo que podría anticipar una mejora general en el desempeño. La variabilidad es moderada, lo que permite que esta variable aporte información relevante al modelo.
 
@@ -176,13 +177,13 @@ barplot(table(datos$usa_ia),
         ylab = "Frecuencia")
 ```
 
-Variable independiente categórica: usa_ia
+- Variable independiente categórica: usa_ia
 
 La distribución del uso de inteligencia artificial es:
 
-No usa IA: 60 estudiantes (60%)
+- No usa IA: 60 estudiantes (60%)
 
-Sí usa IA: 40 estudiantes (40%)
+- Sí usa IA: 40 estudiantes (40%)
 
 Las proporciones son relativamente equilibradas, lo cual es adecuado para el análisis, ya que ambos grupos tienen tamaños suficientes para comparar sus efectos en el modelo sin generar inestabilidad estadística.
 
@@ -237,11 +238,11 @@ tapply(datos$nota_despues, datos$usa_ia, mean)
 
 El diagrama de cajas permite comparar la distribución de las calificaciones finales entre los estudiantes que usan IA y los que no la usan.
 
-Se observa que:
+**Se observa que:**
 
-La mediana de las notas finales es claramente mayor en el grupo que sí usa IA.
+- La mediana de las notas finales es claramente mayor en el grupo que sí usa IA.
 
-La mayor parte de las calificaciones del grupo “Sí” se concentra en valores más altos que las del grupo “No”.
+- La mayor parte de las calificaciones del grupo “Sí” se concentra en valores más altos que las del grupo “No”.
 
 Aunque existe cierta variabilidad en ambos grupos, la distribución completa del grupo que usa IA está desplazada hacia arriba.
 
@@ -290,7 +291,7 @@ $$\hat{Y}= 3.737 + 0.152X_1 + 9.925X_2 + 0.935X_3$$
 
 - 0.935: Por cada punto adicional que el estudiante tenía en su calificación previa, su nota final aumenta en 0.93 puntos
 
-d.  Coeficiente de determinación
+d.  Coeficiente de determinación y coeficiente de determinación ajustado
 
 El coeficiente de determinación $R^2$ mide qué proporción de la variabilidad de la variable dependiente (nota_despues) es explicada por el conjunto de variables independientes incluidas en el modelo: horas de estudio, uso de IA y nota previa.
 
@@ -308,10 +309,13 @@ El coeficiente de determinación ajustado fue: $R^2_{ajustado}$ = 92.5% Este val
 
 e.  Verificación del supuesto de normalidad de errores
 
-```{r}
+```{r setup2, include=FALSE}
 library(broom)
 library(ggplot2)
+library(moments)
+```
 
+```{r}
 # Guardamos los residuales en un objeto
 res <- residuals(modelo)
 
@@ -344,14 +348,13 @@ Al observar el gráfico Q-Q, se aprecia que la mayoría de los residuales se ali
 
 - Coeficiente de asimetría 
 
-$H_0: As = O$
+$H_0: As = 0$
 
 $H_1: As \neq 0$
 
 $\alpha=0.5$
 
 ```{r}
-library(moments)
 res |> agostino.test()
 ```
 
@@ -400,9 +403,6 @@ En la segunda imagen, la línea roja tiene una tendencia ascendente marcada. Est
 Ambos gráficos sugieren la presencia de heterocedasticidad (varianza no constante). Esto indica que el modelo es más preciso para predecir notas bajas que para predecir notas altas.
 
 ```{r}
-library(broom)
-library(ggplot2)
-
 # Usamos augment() para obtener los valores ajustados (.fitted) y los residuales (.resid)
 modelo |> 
   augment() |> 
@@ -439,7 +439,7 @@ $H_1$: La varianza de los errores no son constantes
 
 $\alpha = 0.05$
 
-```{r}
+```{r setup3, include=FALSE}
 library(car)
 ```
 
@@ -467,8 +467,9 @@ data.frame(res) |>
 
 El gráfico de secuencia de residuos no muestra patrones sistemáticos, lo que indica que las observaciones son independientes entre sí.
 
-```{r}
+```{r setup4, include=FALSE}
 library(ggfortify)
+library(TSA)
 ```
 
 ```{r}
@@ -498,5 +499,6 @@ modelo |>
                    max.lag = 10,
                    reps = 1e5)
 ```
+
 
 Si bien los p-valores de la prueba de Durbin-Watson para todos los retardos son superiores a 0.05, lo que técnicamente valida la independencia, se recomienda observar con cautela el comportamiento de los residuales cada 8 observaciones. Se ha detectado una ligera autocorrelación en el desfase (lag) 8 que, aunque no llega a invalidar el modelo, sugiere la existencia de un patrón menor en la recolección de datos. Fuera de esta observación puntual, no existe evidencia de falta de independencia en el resto de la estructura del modelo.
