@@ -284,11 +284,11 @@ $$\hat{Y}= 3.737 + 0.152X_1 + 9.925X_2 + 0.935X_3$$
 
 - 3.737: Es el valor esperado de la nota_despues cuando las horas de estudio, el uso de IA y la nota anterior son cero. En este contexto académico, funciona principalmente como un ajuste matemático del modelo.
 
-- 0.152: Por cada hora adicional de estudio diario, la nota final aumenta en 0.15 puntos.
+- 0.152: Por cada hora adicional de estudio diario, la nota final aumenta en 0.15 puntos manteniendo constante el uso de IA y su nota previa.
 
 - 9.925: Los estudiantes que sí usan IA obtienen, en promedio, 9.92 puntos más en su calificación final que aquellos que no la usan, manteniendo constantes las horas de estudio y su nota previa.
 
-- 0.935: Por cada punto adicional que el estudiante tenía en su calificación previa, su nota final aumenta en 0.93 puntos
+- 0.935: Por cada punto adicional que el estudiante tenía en su calificación previa, su nota final aumenta en 0.93 puntos manteniendo constante las horas de estudio y el uso de IA.
 
 d.  Coeficiente de determinación
 
@@ -631,3 +631,93 @@ En definitiva, el éxito del estudiante depende de conservar su base académica,
 
 k.  Estimación de una media (puntual e intervalar) 
 
+El objetivo de esta sección es estimar la nota final promedio esperada de un grupo de estudiantes que presentan características específicas en las variables explicativas del modelo. A diferencia de la predicción individual, aquí se busca inferir el valor medio poblacional de la variable respuesta condicionado a ciertos valores de las variables independientes. Esta estimación se realiza utilizando el modelo de regresión lineal múltiple previamente ajustado, manteniendo constantes los coeficientes estimados y modificando únicamente los valores de las variables explicativas.
+
+Para la estimación de la media, se consideran los siguientes valores:
+
+- Horas de estudio: 3 horas diarias
+
+- Uso de IA: Sí
+
+- Nota previa: 65 puntos
+
+Estos valores no son arbitrarios, ya que:
+
+- 3 horas de estudio corresponde aproximadamente al promedio observado en el dataset.
+
+- 65 puntos es un valor cercano a la media de la variable nota_antes.
+
+- El uso de IA es una categoría relevante y ampliamente representada en la muestra.
+
+k.1 Estimación puntual de la media
+
+```{r}
+nuevo_promedio <- data.frame(
+  horas_estudio = 3,
+  usa_ia = "Sí",
+  nota_antes = 65
+)
+
+predict(modelo, newdata = nuevo_promedio)
+```
+La estimación puntual indica que la nota final promedio esperada para estudiantes que estudian 3 horas diarias, utilizan herramientas de inteligencia artificial y tenían una nota previa de 65 es 74.87 puntos.
+
+k.2 Estimación intervalar de la media (Intervalo de Confianza)
+
+```{r}
+predict(modelo, newdata = nuevo_promedio,
+        interval = "confidence", level = 0.95)
+```
+
+Con un 95% de confianza, la nota final promedio de los estudiantes que estudian 3 horas diarias, utilizan herramientas de inteligencia artificial y tenían una nota previa de 65 puntos se encuentra entre 74.17 y 75.57 puntos.
+
+**"Aunque el modelo presenta un alto poder explicativo, se ha detectado la presencia de heterocedasticidad y desviaciones de la normalidad en los errores. Por tal motivo, el intervalo de confianza para la media debe interpretarse con cautela, ya que la varianza no constante puede afectar la precisión de la inferencia estadística. No obstante, la estimación se mantiene con fines descriptivos y pedagógicos."**
+
+l. Predicción de un nuevo valor (puntual e intervalar)
+
+En esta sección se realiza la predicción de la nota final de un estudiante individual, considerando características específicas. A diferencia del apartado anterior, aquí se incorpora no solo la incertidumbre del modelo, sino también la variabilidad individual, por lo que se utiliza un intervalo de predicción.
+
+Selección y justificación del perfil del estudiante
+
+Se considera un estudiante con las siguientes características:
+
+- Horas de estudio: 4 horas diarias
+
+- Uso de IA: Sí
+
+- Nota previa: 70 puntos
+
+Estos valores son coherentes porque:
+
+- Se encuentran dentro del rango observado en el dataset.
+
+- Representan un estudiante con desempeño previo relativamente alto.
+
+- Permiten analizar el comportamiento del modelo en un nivel superior al promedio.
+
+l.1 Predicción puntual
+
+```{r}
+nuevo_estudiante <- data.frame(
+  horas_estudio = 4,
+  usa_ia = "Sí",
+  nota_antes = 70
+)
+
+predict(modelo, newdata = nuevo_estudiante)
+```
+
+Utilizando el modelo de regresión lineal múltiple ajustado, se predice que la nota final esperada para un estudiante que estudia 4 horas diarias, utiliza herramientas de inteligencia artificial y tenía una nota previa de 70 puntos es aproximadamente 79.70 puntos.
+
+l.2 Predicción intervalar (Intervalo de Predicción)
+
+```{r}
+predict(modelo, newdata = nuevo_estudiante,
+        interval = "prediction", level = 0.95)
+```
+
+Con un 95% de confianza, la nota final de un estudiante que estudia 4 horas diarias, utiliza herramientas de inteligencia artificial y tenía una nota previa de 70 puntos se encontrará entre 75.20 y 84.20 puntos.
+
+Este intervalo de predicción incorpora tanto la incertidumbre del modelo como la variabilidad individual inherente al desempeño académico de cada estudiante.
+
+**"Debido a la presencia de heterocedasticidad en los errores del modelo, el intervalo de predicción puede no reflejar con total precisión la verdadera dispersión de los valores individuales. En consecuencia, la predicción debe interpretarse como una aproximación razonable y no como un valor exacto."**
