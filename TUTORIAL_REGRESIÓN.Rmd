@@ -628,3 +628,6 @@ Al comparar el t-crítico con el t-calculado, rechazamos $H_0$. Por lo tanto pod
 En definitiva, el éxito del estudiante depende de conservar su base académica, pero se ve potenciado principalmente por el uso de herramientas tecnológicas, el cual supera en efectividad al incremento de horas de estudio tradicional.
 
 ***Podemos concluir que o todas las variables se comportan como predecimos: mientras que la base académica es una constante predecible (1 a 1), la IA y las horas de estudio requieren un análisis más profundo al alejarse de los estándares teóricos de 5 y 1.5 puntos respectivamente***
+
+k.  Estimación de una media (puntual e intervalar) 
+
