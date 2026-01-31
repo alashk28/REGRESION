@@ -309,9 +309,7 @@ El coeficiente de determinación ajustado fue: $R^2_{ajustado}$ = 92.5% Este val
 e.  Verificación del supuesto de normalidad de errores
 
 ```{r}
-library(broom)
 library(ggplot2)
-
 # Guardamos los residuales en un objeto
 res <- residuals(modelo)
 
@@ -330,6 +328,7 @@ data.frame(res) |>
   theme_minimal()
 
 ```
+
 En el análisis gráfico de los residuales, se observa una distribución aproximadamente simétrica. Sin embargo, la curva de densidad muestra una forma leptocúrtica (apuntamiento pronunciado), lo que sugiere que los errores están muy concentrados alrededor de la media. 
 
 ```{r}
@@ -340,6 +339,7 @@ stat_qq_line(distribution = stats::qnorm)+
 labs(x = "Cuantil teórico", y = "Residuales")+
 theme_minimal()
 ```
+
 Al observar el gráfico Q-Q, se aprecia que la mayoría de los residuales se alinean con la diagonal teórica, especialmente en el sector central. No obstante, en los extremos se observa unalejamiento de los puntos, lo cual es coherente con la leptocurtosis detectada en el histograma.
 
 - Coeficiente de asimetría 
@@ -363,7 +363,7 @@ $H_0: k = 3$
 
 $H_1: k \neq 3$
 
-$\alpha=0.5$
+$\alpha=0.05$
 
 ```{r}
 res |> anscombe.test()
@@ -383,6 +383,9 @@ res |> shapiro.test()
 ```
 "Al realizar la prueba de Shapiro-Wilk, se obtuvo un p-valor de $7.057 \times 10^{-7}$. Al ser menor al nivel de significancia $\alpha = 0.05$, se rechaza la hipótesis nula, concluyendo que los residuales no siguen una distribución normal. Esta falta de normalidad, impulsada por la marcada leptocurtosis observada en el histograma, sugiere que las inferencias del modelo deben tomarse con cautela.
 
+**Al evaluar el supuesto de normalidad, se observa una discrepancia entre las pruebas. Por un lado, las pruebas de D’Agostino ($p = 0.4972$) y Anscombe-Glynn ($p = 0.0999$) sugieren que los residuales mantienen niveles aceptables de simetría y curtosis. Sin embargo, la prueba de Shapiro-Wilk arroja un p-valor de $7.057 \times 10^{-7}$, rechazando la hipótesis nula de normalidad global. Esta sensibilidad de Shapiro-Wilk confirma que existen desviaciones en las colas de la distribución, como se aprecia en la forma de 'S' del gráfico Q-Q."**
+
+
 f. Verificación del supuesto de homocedasticidad de errores 
 
 ```{r}
@@ -401,13 +404,11 @@ Ambos gráficos sugieren la presencia de heterocedasticidad (varianza no constan
 
 ```{r}
 library(broom)
-library(ggplot2)
-
 # Usamos augment() para obtener los valores ajustados (.fitted) y los residuales (.resid)
 modelo |> 
   augment() |> 
   ggplot(aes(x = .fitted, y = .resid)) +
-  geom_point(size = 3, color = "steelblue", alpha = 0.7) +
+  geom_point(size = 3, color = "steelblue", alpha = 0.5) +
   geom_hline(yintercept = 0, color = "red", linetype = "dashed") +
   labs(x = "Valores ajustados (Puntaje de diagnóstico)",
        y = "Residual",
@@ -465,7 +466,7 @@ data.frame(res) |>
   theme_minimal()
 ```
 
-El gráfico de secuencia de residuos no muestra patrones sistemáticos, lo que indica que las observaciones son independientes entre sí.
+El gráfico de secuencia de residuos no muestra patrones sistemáticos, lo que indicaría que las observaciones son independientes entre sí.
 
 ```{r}
 library(ggfortify)
@@ -483,7 +484,7 @@ res |>
   theme_minimal()
 ```
 
-Todas las autocorrelaciones son estadísticamente iguales a cero (están dentro de los límites azules de confianza), lo que evidenciaría el cumplimiento del supuesto de independencia de errores.
+Para verificar la independencia de los errores, se generó un correlograma (ACF). Se observa que casi la totalidad de las barras de autocorrelación se encuentran dentro de las bandas de confianza (líneas azules), a excepción de una ligera desviación en el primer desfase. Esto sugiere que no existe una dependencia lineal significativa entre los residuos consecutivos, cumpliéndose de manera razonable el supuesto de independencia necesario para la validez del modelo.
 
 $H_0$: Los errores son independientes
 
@@ -499,4 +500,131 @@ modelo |>
                    reps = 1e5)
 ```
 
-Si bien los p-valores de la prueba de Durbin-Watson para todos los retardos son superiores a 0.05, lo que técnicamente valida la independencia, se recomienda observar con cautela el comportamiento de los residuales cada 8 observaciones. Se ha detectado una ligera autocorrelación en el desfase (lag) 8 que, aunque no llega a invalidar el modelo, sugiere la existencia de un patrón menor en la recolección de datos. Fuera de esta observación puntual, no existe evidencia de falta de independencia en el resto de la estructura del modelo.
+Para validar el supuesto de independencia, se aplicó la prueba de Durbin-Watson extendida hasta 10 retardos. Los resultados muestran que para todos los niveles de desfase, los p-valores son superiores al nivel de significancia $\alpha = 0.05$ (p-valor lag 1 = 0.062). Al no rechazar la hipótesis nula, se concluye que no existe autocorrelación significativa en los residuales. Este hallazgo es consistente con el gráfico ACF, confirmando que el modelo cumple con el supuesto de independencia necesario para la inferencia estadística.
+
+***Aunque se detectó falta de normalidad y heterocedasticidad, lo cual sugeriría una transformación de variables, se ha decidido proceder con los datos originales para mantener la interpretabilidad pedagógica del tutorial. No obstante, se incluye una Nota de Precaución indicando que las inferencias (pruebas $t$ y $F$) podrían presentar ligeras desviaciones.***
+
+i) Prueba de hipótesis global
+
+Una vez ajustado el modelo, es necesario verificar si este tiene capacidad predictiva global. La Prueba de Hipótesis Global utiliza el estadístico F para determinar si existe una relación lineal entre la variable respuesta y el conjunto de variables explicativas.
+
+$H_0: \beta_0 = \beta_1 = \beta_2 = \beta_3 =0:$ Ninguna de las variables explicativas influye linealmente en la nota después.
+
+$H_1:$ Al menos un $\beta_j \neq 0$ : Al menos una de las variables tiene un efecto significativo sobre la nota después.
+
+$\alpha=0.05$
+
+```{r}
+library(broom)
+# Usamos las variables: nota_despues (Y), horas_estudio, usa_ia y nota_antes (X's)
+
+X = model.matrix(nota_despues ~ horas_estudio + usa_ia + nota_antes ,data=datos)
+anova = aov(nota_despues ~ X, datos) |> tidy()
+anova
+```
+
+Se observa que el p-valor es mucho menor que el alpha, por lo tanto, se rechaza H0, entonces podemos concluir que al menos una de las variables tienen un efecto significativo sobre la variable respuesta (nota_despues).
+
+**"A pesar de la significancia global observada en esta prueba F, recordamos que las inferencias deben tomarse con cautela debido a la falta de normalidad en los errores"**
+
+j). Pruebas de hipótesis individuales
+
+Esta prueba evalúa si cada variable independiente, de manera individual, tiene un efecto significativo sobre la nota final, manteniendo las demás constantes.
+
+Una vez que sabemos que el modelo es útil globalmente, el siguiente paso es analizar cada variable por separado. ¿Realmente cada una aporta al modelo? Para esto, realizamos una Prueba t.
+
+Definimos el modelo
+
+```{r}
+modelo2 = lm(nota_despues ~ horas_estudio + usa_ia + nota_antes, datos)
+modelo2 |> tidy()
+```
+
+Paso 1: Formular las Hipótesis
+
+- Variable: nota_antes
+
+¿Es posible que la nota final aumente exactamente en la misma proporción (1 a 1) que la nota inicial?
+
+$H_0: \beta_{\text{nota_antes}} = 1$
+
+$H_1: \beta_{\text{nota_antes}} \neq 1$
+
+Paso 2: Calculamos el estadístico de prueba
+
+$$t_{calc}=\frac{0.935-1}{0.037}$$
+
+```{r}
+(0.935-1)/0.037
+```
+Paso 3: Calculamos el t-critico, al ser una prueba bilateral, definimos t-crítico para un 95% de confianza (alpha = 0.05) para los 2 lados.
+
+```{r}
+qt(0.025, 96)
+```
+```{r}
+qt(0.975, 96)
+```
+Al comparar el t-crítico con el t-calculado, no rechazamos $H_0$. Esto significa que sí se puede afirmar que existe una relación de 1 a 1 entre la nota inicial y la final, confirmando que la base académica previa se mantiene de forma exacta en el resultado.
+
+- Variable: horas_estudio
+
+¿Se puede afirmar que por cada hora adicional de estudio, la nota final aumenta en 1.5 puntos, manteniendo lo demás constante?
+
+Paso 1: Formular las Hipótesis
+
+$H_0: \beta_{\text{horas_estudio}} = 1.5$
+
+$H_1: \beta_{\text{horas_estudio}} \neq 1.5$
+
+Paso 2: Calculamos el estadístico de prueba
+
+$$t_{calc}=\frac{0.152-1.5}{0.200}$$
+
+```{r}
+(0.152-1.5)/0.200
+```
+
+Paso 3: Calculamos el t-critico, al ser una prueba bilateral, definimos t-crítico para un 95% de confianza (alpha = 0.05) para los 2 lados.
+
+```{r}
+qt(0.025, 96)
+```
+```{r}
+qt(0.975, 96)
+```
+Al comparar el t-crítico con el t-calculado, rechazamos $H_0$.Esto significa que no se puede afirmar que cada hora adicional de estudio incremente la nota exactamente en 1.5 puntos.
+
+- Variable: usa_ia
+
+Un informe previo indica que el uso de IA mejora las notas en 5 puntos. ¿Los datos actuales permiten afirmar que el impacto es distinto a esos 5 puntos?
+
+Paso 1: Formular las Hipótesis
+
+$H_0: \beta_{\text{usa_ia}} = 5$
+
+$H_1: \beta_{\text{usa_ia}} \neq 5$
+
+Paso 2: Calculamos el estadístico de prueba
+
+$$t_{calc}=\frac{-9.925-5}{0.459}$$
+
+```{r}
+(-9.925-5)/0.459
+```
+
+Paso 3: Calculamos el t-critico, al ser una prueba bilateral, definimos t-crítico para un 95% de confianza (alpha = 0.05) para los 2 lados.
+
+```{r}
+qt(0.025, 96)
+```
+
+```{r}
+qt(0.975, 96)
+```
+
+Al comparar el t-crítico con el t-calculado, rechazamos $H_0$. Por lo tanto podemos concluir que existe evidencia estadística suficiente para afirmar que el uso de IA tiene un efecto diferente a 5 puntos.
+
+En definitiva, el éxito del estudiante depende de conservar su base académica, pero se ve potenciado principalmente por el uso de herramientas tecnológicas, el cual supera en efectividad al incremento de horas de estudio tradicional.
+
+***Podemos concluir que o todas las variables se comportan como predecimos: mientras que la base académica es una constante predecible (1 a 1), la IA y las horas de estudio requieren un análisis más profundo al alejarse de los estándares teóricos de 5 y 1.5 puntos respectivamente***
