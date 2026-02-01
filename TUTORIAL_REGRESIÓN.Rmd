@@ -42,31 +42,39 @@ b.  Objetivos de aprendizaje
 
 En la actualidad educativa, el uso de recursos de inteligencia artificial se ha popularizado entre los alumnos como un medio complementario para el aprendizaje y la ejecución de tareas académicas. Sin embargo, hay dudas respecto al verdadero efecto de estas tecnologías en el desempeño académico. Así, el objetivo de este tutorial es examinar cómo el uso de la inteligencia artificial se relaciona con el desempeño académico de los estudiantes, el cual se medirá a través de sus calificaciones posteriores, teniendo en cuenta además aspectos importantes como las horas dedicadas al estudio cada día y el rendimiento académico previo, utilizando un modelo de regresión lineal múltiple.
 
-b.  Origen del dataset: https://www.kaggle.com/datasets/aminasalamt/students-ai-usage-and-academic-performance
+b.  Origen del dataset: <https://www.kaggle.com/datasets/aminasalamt/students-ai-usage-and-academic-performance>
 
 ## Definición de variables
 
 #### Variable dependiente
 
-1. **nota_despues**\
-- **Tipo:** Cuantitativa continua\
-- **Descripción:** Calificación final del estudiante tras el periodo de uso de herramientas de IA. Es la variable que deseamos predecir o explicar.
+1.  **nota_despues**\
+
+-   **Tipo:** Cuantitativa continua\
+-   **Descripción:** Calificación final del estudiante tras el periodo de uso de herramientas de IA. Es la variable que deseamos predecir o explicar.
 
 #### Variables independientes
 
-1. **horas_estudio**\
-- **Tipo:** Cuantitativa continua\
-- **Descripción:** Tiempo promedio diario (en horas) dedicado al estudio personal.
+1.  **horas_estudio**\
 
-2. **usa_ia**\
-- **Tipo:** Cualitativa dicotómica (dummy)\
-- **Descripción:** Variable que indica si el estudiante utiliza herramientas de inteligencia artificial como apoyo en sus estudios (1 = sí, 0 = no).
+-   **Tipo:** Cuantitativa continua\
+-   **Descripción:** Tiempo promedio diario (en horas) dedicado al estudio personal.
 
-3. **nota_antes**\
-- **Tipo:** Cuantitativa continua\
-- **Descripción:** Calificación obtenida por el estudiante antes del uso de herramientas de inteligencia artificial.
+2.  **usa_ia**\
+
+-   **Tipo:** Cualitativa dicotómica (dummy)\
+-   **Descripción:** Variable que indica si el estudiante utiliza herramientas de inteligencia artificial como apoyo en sus estudios (1 = sí, 0 = no).
+
+3.  **nota_antes**\
+
+-   **Tipo:** Cuantitativa continua\
+-   **Descripción:** Calificación obtenida por el estudiante antes del uso de herramientas de inteligencia artificial.
 
 ## Exploración de datos
+
+**¿Por qué explorar los datos?**
+
+Antes de ajustar un modelo de regresión, es fundamental conocer el comportamiento de las variables. La exploración de datos permite identificar valores atípicos, rangos plausibles, niveles de dispersión y posibles problemas que podrían afectar la validez del modelo.
 
 ```{r}
 # Cargar librerías
@@ -249,46 +257,56 @@ Esto indica que, de manera descriptiva, los estudiantes que utilizan herramienta
 
 ## Modelamiento
 
-a. Formulación del modelo
+a.  Formulación del modelo
 
 $$
 Y_i = \beta_0 + \beta_1 X_{1} + \beta_2 X_{2} + \beta_3 X_{3} + \varepsilon
-$$ 
+$$
 
 Dónde:
 
-- $Y:$ nota despues (Calificación final del estudiante)
+-   $Y:$ nota despues (Calificación final del estudiante)
 
-- $X_1:$ horas estudio (Horas de estudio diarias)
+-   $X_1:$ horas estudio (Horas de estudio diarias)
 
-- $X_2:$ usa ia (Variable dummy: 1 si usa IA, 0 si no usa)
+-   $X_2:$ usa ia (Variable dummy: 1 si usa IA, 0 si no usa)
 
-- $X_3:$ nota antes (Calificación previa del estudiante)
+-   $X_3:$ nota antes (Calificación previa del estudiante)
 
-- $\beta_0:$ intercepto del modelo
+-   $\beta_0:$ intercepto del modelo
 
-- $\beta_1, \beta_2, \beta_3:$ coeficientes de regresión para cada variable explicativa
+-   $\beta_1, \beta_2, \beta_3:$ coeficientes de regresión para cada variable explicativa
 
-- $\epsilon:$ error del modelo
+-   $\epsilon:$ error del modelo
 
-b. Ajuste del modelo
+b.  Ajuste del modelo
+
+Se construye el modelo considerando como variable dependiente la nota final del estudiante y como variables explicativas las horas de estudio, el uso de IA y la nota previa.
 
 ```{r}
 modelo = lm(nota_despues ~ horas_estudio + usa_ia + nota_antes, data = datos)
 modelo |> coef()
 ```
 
+Este comando indica que:
+
+- nota_despues es la variable a explicar,
+
+- horas_estudio, usa_ia y nota_antes actúan como predictores,
+
+el modelo se ajusta usando el método de mínimos cuadrados ordinarios.
+
 c.  Interpretación de los coeficientes de regresión
 
 $$\hat{Y}= 3.737 + 0.152X_1 + 9.925X_2 + 0.935X_3$$
 
-- 3.737: Es el valor esperado de la nota_despues cuando las horas de estudio, el uso de IA y la nota anterior son cero. En este contexto académico, funciona principalmente como un ajuste matemático del modelo.
+-   3.737: Es el valor esperado de la nota_despues cuando las horas de estudio, el uso de IA y la nota anterior son cero. En este contexto académico, funciona principalmente como un ajuste matemático del modelo.
 
-- 0.152: Por cada hora adicional de estudio diario, la nota final aumenta en 0.15 puntos manteniendo constante el uso de IA y su nota previa.
+-   0.152: Por cada hora adicional de estudio diario, la nota final aumenta en 0.15 puntos manteniendo constante el uso de IA y su nota previa.
 
-- 9.925: Los estudiantes que sí usan IA obtienen, en promedio, 9.92 puntos más en su calificación final que aquellos que no la usan, manteniendo constantes las horas de estudio y su nota previa.
+-   9.925: Los estudiantes que sí usan IA obtienen, en promedio, 9.92 puntos más en su calificación final que aquellos que no la usan, manteniendo constantes las horas de estudio y su nota previa.
 
-- 0.935: Por cada punto adicional que el estudiante tenía en su calificación previa, su nota final aumenta en 0.93 puntos manteniendo constante las horas de estudio y el uso de IA.
+-   0.935: Por cada punto adicional que el estudiante tenía en su calificación previa, su nota final aumenta en 0.93 puntos manteniendo constante las horas de estudio y el uso de IA.
 
 d.  Coeficiente de determinación
 
@@ -307,6 +325,8 @@ summary(modelo)$adj.r.squared
 El coeficiente de determinación ajustado fue: $R^2_{ajustado}$ = 92.5% Este valor es muy cercano al $R^2$, lo que indica que las variables incluidas son relevantes y que el modelo no está sobreajustado. Es decir, cada variable aporta información útil para explicar el rendimiento académico final.
 
 e.  Verificación del supuesto de normalidad de errores
+
+Este supuesto establece que los residuos del modelo de regresión deben seguir aproximadamente una distribución normal. Su verificación es importante porque garantiza la validez de las pruebas de hipótesis y de los intervalos de confianza asociados a los coeficientes del modelo.
 
 ```{r}
 library(ggplot2)
@@ -329,7 +349,7 @@ data.frame(res) |>
 
 ```
 
-En el análisis gráfico de los residuales, se observa una distribución aproximadamente simétrica. Sin embargo, la curva de densidad muestra una forma leptocúrtica (apuntamiento pronunciado), lo que sugiere que los errores están muy concentrados alrededor de la media. 
+En el análisis gráfico de los residuales, se observa una distribución aproximadamente simétrica. Sin embargo, la curva de densidad muestra una forma leptocúrtica (apuntamiento pronunciado), lo que sugiere que los errores están muy concentrados alrededor de la media.
 
 ```{r}
 data.frame(res) |>
@@ -342,7 +362,7 @@ theme_minimal()
 
 Al observar el gráfico Q-Q, se aprecia que la mayoría de los residuales se alinean con la diagonal teórica, especialmente en el sector central. No obstante, en los extremos se observa unalejamiento de los puntos, lo cual es coherente con la leptocurtosis detectada en el histograma.
 
-- Coeficiente de asimetría 
+-   Coeficiente de asimetría
 
 $H_0: As = O$
 
@@ -357,7 +377,7 @@ res |> agostino.test()
 
 Dado que el p-valor (0.4972) es notablemente mayor al nivel de significancia $\alpha = 0.05$, no se rechaza la hipótesis nula ($H_0$). Esto significa que no existe evidencia suficiente para afirmar que los errores son asimétricos. En términos estadísticos, los residuales presentan una simetría aceptable, lo cual es un indicio favorable para el cumplimiento del supuesto de normalidad.
 
-- Curtosis
+-   Curtosis
 
 $H_0: k = 3$
 
@@ -368,11 +388,12 @@ $\alpha=0.05$
 ```{r}
 res |> anscombe.test()
 ```
+
 Observamos que el p-valor (0.09991) es mayor que el nivel de significancia. Por lo tanto, no se rechaza la hipótesis nula (los datos son mesocúrticos).
 
-**En conclusión, tras realizar las pruebas de D'Agostino y Anscombe-Glynn, se obtuvieron p-valores de 0.4972 y 0.0999 respectivamente. Dado que ambos son superiores al nivel de significancia $\alpha = 0.05$, no se rechaza la hipótesis nula de simetría ni la de mesocurtosis. Por lo tanto, a pesar de las irregularidades visuales observadas en los gráficos, contamos con evidencia estadística suficiente para asumir el cumplimiento del supuesto de normalidad en los residuales del modelo.**
+**En conclusión, tras realizar las pruebas de D'Agostino y Anscombe-Glynn, se obtuvieron p-valores de 0.4972 y 0.0999 respectivamente. Dado que ambos son superiores al nivel de significancia** $\alpha = 0.05$, no se rechaza la hipótesis nula de simetría ni la de mesocurtosis. Por lo tanto, a pesar de las irregularidades visuales observadas en los gráficos, contamos con evidencia estadística suficiente para asumir el cumplimiento del supuesto de normalidad en los residuales del modelo.
 
-- Prueba de normalidad
+-   Prueba de normalidad
 
 $H_0:$ los errores siguen una distribucion normal
 
@@ -381,12 +402,14 @@ $H_1:$ los errores no siguen una distribucion normal
 ```{r}
 res |> shapiro.test()
 ```
+
 "Al realizar la prueba de Shapiro-Wilk, se obtuvo un p-valor de $7.057 \times 10^{-7}$. Al ser menor al nivel de significancia $\alpha = 0.05$, se rechaza la hipótesis nula, concluyendo que los residuales no siguen una distribución normal. Esta falta de normalidad, impulsada por la marcada leptocurtosis observada en el histograma, sugiere que las inferencias del modelo deben tomarse con cautela.
 
-**Al evaluar el supuesto de normalidad, se observa una discrepancia entre las pruebas. Por un lado, las pruebas de D’Agostino ($p = 0.4972$) y Anscombe-Glynn ($p = 0.0999$) sugieren que los residuales mantienen niveles aceptables de simetría y curtosis. Sin embargo, la prueba de Shapiro-Wilk arroja un p-valor de $7.057 \times 10^{-7}$, rechazando la hipótesis nula de normalidad global. Esta sensibilidad de Shapiro-Wilk confirma que existen desviaciones en las colas de la distribución, como se aprecia en la forma de 'S' del gráfico Q-Q."**
+**Al evaluar el supuesto de normalidad, se observa una discrepancia entre las pruebas. Por un lado, las pruebas de D’Agostino (**$p = 0.4972$) y Anscombe-Glynn ($p = 0.0999$) sugieren que los residuales mantienen niveles aceptables de simetría y curtosis. Sin embargo, la prueba de Shapiro-Wilk arroja un p-valor de $7.057 \times 10^{-7}$, rechazando la hipótesis nula de normalidad global. Esta sensibilidad de Shapiro-Wilk confirma que existen desviaciones en las colas de la distribución, como se aprecia en la forma de 'S' del gráfico Q-Q."
 
+f.  Verificación del supuesto de homocedasticidad de errores
 
-f. Verificación del supuesto de homocedasticidad de errores 
+Este supuesto indica que la varianza de los residuos debe ser constante para todos los valores de la variable explicativa. Su cumplimiento asegura que las estimaciones de los coeficientes sean eficientes y que las inferencias estadísticas sean confiables.
 
 ```{r}
 modelo |> plot(which=1)
@@ -450,7 +473,9 @@ modelo |> ncvTest()
 
 Se rechaza la hipotesis nula, por lo tanto no se verifica el supuesto de homogeneidad de varianza de los errores
 
-g. Verificación del supuesto de independencia de errores 
+g.  Verificación del supuesto de independencia de errores
+
+Este supuesto establece que los errores del modelo no deben estar correlacionados entre sí. Su verificación es fundamental para evitar sesgos en la estimación de los coeficientes y en las pruebas estadísticas.
 
 ```{r}
 # Usamos los residuales de tu modelo (res) y el total de datos
@@ -502,9 +527,9 @@ modelo |>
 
 Para validar el supuesto de independencia, se aplicó la prueba de Durbin-Watson extendida hasta 10 retardos. Los resultados muestran que para todos los niveles de desfase, los p-valores son superiores al nivel de significancia $\alpha = 0.05$ (p-valor lag 1 = 0.062). Al no rechazar la hipótesis nula, se concluye que no existe autocorrelación significativa en los residuales. Este hallazgo es consistente con el gráfico ACF, confirmando que el modelo cumple con el supuesto de independencia necesario para la inferencia estadística.
 
-***Aunque se detectó falta de normalidad y heterocedasticidad, lo cual sugeriría una transformación de variables, se ha decidido proceder con los datos originales para mantener la interpretabilidad pedagógica del tutorial. No obstante, se incluye una Nota de Precaución indicando que las inferencias (pruebas $t$ y $F$) podrían presentar ligeras desviaciones.***
+***Aunque se detectó falta de normalidad y heterocedasticidad, lo cual sugeriría una transformación de variables, se ha decidido proceder con los datos originales para mantener la interpretabilidad pedagógica del tutorial. No obstante, se incluye una Nota de Precaución indicando que las inferencias (pruebas*** $t$ y $F$) podrían presentar ligeras desviaciones.
 
-i) Prueba de hipótesis global
+i)  Prueba de hipótesis global
 
 Una vez ajustado el modelo, es necesario verificar si este tiene capacidad predictiva global. La Prueba de Hipótesis Global utiliza el estadístico F para determinar si existe una relación lineal entre la variable respuesta y el conjunto de variables explicativas.
 
@@ -542,7 +567,7 @@ modelo2 |> tidy()
 
 Paso 1: Formular las Hipótesis
 
-- Variable: nota_antes
+-   Variable: nota_antes
 
 ¿Es posible que la nota final aumente exactamente en la misma proporción (1 a 1) que la nota inicial?
 
@@ -557,17 +582,20 @@ $$t_{calc}=\frac{0.935-1}{0.037}$$
 ```{r}
 (0.935-1)/0.037
 ```
+
 Paso 3: Calculamos el t-critico, al ser una prueba bilateral, definimos t-crítico para un 95% de confianza (alpha = 0.05) para los 2 lados.
 
 ```{r}
 qt(0.025, 96)
 ```
+
 ```{r}
 qt(0.975, 96)
 ```
+
 Al comparar el t-crítico con el t-calculado, no rechazamos $H_0$. Esto significa que sí se puede afirmar que existe una relación de 1 a 1 entre la nota inicial y la final, confirmando que la base académica previa se mantiene de forma exacta en el resultado.
 
-- Variable: horas_estudio
+-   Variable: horas_estudio
 
 ¿Se puede afirmar que por cada hora adicional de estudio, la nota final aumenta en 1.5 puntos, manteniendo lo demás constante?
 
@@ -590,12 +618,14 @@ Paso 3: Calculamos el t-critico, al ser una prueba bilateral, definimos t-críti
 ```{r}
 qt(0.025, 96)
 ```
+
 ```{r}
 qt(0.975, 96)
 ```
+
 Al comparar el t-crítico con el t-calculado, rechazamos $H_0$.Esto significa que no se puede afirmar que cada hora adicional de estudio incremente la nota exactamente en 1.5 puntos.
 
-- Variable: usa_ia
+-   Variable: usa_ia
 
 Un informe previo indica que el uso de IA mejora las notas en 5 puntos. ¿Los datos actuales permiten afirmar que el impacto es distinto a esos 5 puntos?
 
@@ -629,27 +659,32 @@ En definitiva, el éxito del estudiante depende de conservar su base académica,
 
 ***Podemos concluir que o todas las variables se comportan como predecimos: mientras que la base académica es una constante predecible (1 a 1), la IA y las horas de estudio requieren un análisis más profundo al alejarse de los estándares teóricos de 5 y 1.5 puntos respectivamente***
 
-k.  Estimación de una media (puntual e intervalar) 
+k.  Estimación de una media (puntual e intervalar)
 
 El objetivo de esta sección es estimar la nota final promedio esperada de un grupo de estudiantes que presentan características específicas en las variables explicativas del modelo. A diferencia de la predicción individual, aquí se busca inferir el valor medio poblacional de la variable respuesta condicionado a ciertos valores de las variables independientes. Esta estimación se realiza utilizando el modelo de regresión lineal múltiple previamente ajustado, manteniendo constantes los coeficientes estimados y modificando únicamente los valores de las variables explicativas.
 
+Paso 1: Definición del perfil promedio a evaluar
+
 Para la estimación de la media, se consideran los siguientes valores:
 
-- Horas de estudio: 3 horas diarias
+-   Horas de estudio: 3 horas diarias
 
-- Uso de IA: Sí
+-   Uso de IA: Sí
 
-- Nota previa: 65 puntos
+-   Nota previa: 65 puntos
 
 Estos valores no son arbitrarios, ya que:
 
-- 3 horas de estudio corresponde aproximadamente al promedio observado en el dataset.
+-   3 horas de estudio corresponde aproximadamente al promedio observado en el dataset.
 
-- 65 puntos es un valor cercano a la media de la variable nota_antes.
+-   65 puntos es un valor cercano a la media de la variable nota_antes.
 
-- El uso de IA es una categoría relevante y ampliamente representada en la muestra.
+-   El uso de IA es una categoría relevante y ampliamente representada en la muestra.
 
 k.1 Estimación puntual de la media
+
+Paso 2: Construcción del nuevo conjunto de datos (media poblacional)
+Se crea un nuevo data.frame que representa el perfil promedio definido anteriormente.
 
 ```{r}
 nuevo_promedio <- data.frame(
@@ -657,12 +692,19 @@ nuevo_promedio <- data.frame(
   usa_ia = "Sí",
   nota_antes = 65
 )
+```
 
+Se utiliza el modelo ajustado para obtener la estimación puntual de la nota final promedio correspondiente a este perfil.
+
+```{r}
 predict(modelo, newdata = nuevo_promedio)
 ```
+
 La estimación puntual indica que la nota final promedio esperada para estudiantes que estudian 3 horas diarias, utilizan herramientas de inteligencia artificial y tenían una nota previa de 65 es 74.87 puntos.
 
 k.2 Estimación intervalar de la media (Intervalo de Confianza)
+
+Para cuantificar la incertidumbre asociada a la estimación de la media, se construye un intervalo de confianza al 95%.
 
 ```{r}
 predict(modelo, newdata = nuevo_promedio,
@@ -673,29 +715,33 @@ Con un 95% de confianza, la nota final promedio de los estudiantes que estudian 
 
 **"Aunque el modelo presenta un alto poder explicativo, se ha detectado la presencia de heterocedasticidad y desviaciones de la normalidad en los errores. Por tal motivo, el intervalo de confianza para la media debe interpretarse con cautela, ya que la varianza no constante puede afectar la precisión de la inferencia estadística. No obstante, la estimación se mantiene con fines descriptivos y pedagógicos."**
 
-l. Predicción de un nuevo valor (puntual e intervalar)
+l.  Predicción de un nuevo valor (puntual e intervalar)
 
 En esta sección se realiza la predicción de la nota final de un estudiante individual, considerando características específicas. A diferencia del apartado anterior, aquí se incorpora no solo la incertidumbre del modelo, sino también la variabilidad individual, por lo que se utiliza un intervalo de predicción.
 
-Selección y justificación del perfil del estudiante
+Paso 1: Selección y justificación del perfil del estudiante
 
 Se considera un estudiante con las siguientes características:
 
-- Horas de estudio: 4 horas diarias
+-   Horas de estudio: 4 horas diarias
 
-- Uso de IA: Sí
+-   Uso de IA: Sí
 
-- Nota previa: 70 puntos
+-   Nota previa: 70 puntos
 
 Estos valores son coherentes porque:
 
-- Se encuentran dentro del rango observado en el dataset.
+-   Se encuentran dentro del rango observado en el dataset.
 
-- Representan un estudiante con desempeño previo relativamente alto.
+-   Representan un estudiante con desempeño previo relativamente alto.
 
-- Permiten analizar el comportamiento del modelo en un nivel superior al promedio.
+-   Permiten analizar el comportamiento del modelo en un nivel superior al promedio.
 
 l.1 Predicción puntual
+
+Paso 2: Construcción del nuevo conjunto de datos (estudiante individual)
+
+Se define un nuevo data.frame que representa al estudiante individual a predecir.
 
 ```{r}
 nuevo_estudiante <- data.frame(
@@ -703,13 +749,22 @@ nuevo_estudiante <- data.frame(
   usa_ia = "Sí",
   nota_antes = 70
 )
+```
 
+Paso 3: Predicción puntual del nuevo valor
+
+Se obtiene la predicción puntual de la nota final del estudiante utilizando el modelo ajustado.
+
+```{r}
 predict(modelo, newdata = nuevo_estudiante)
+
 ```
 
 Utilizando el modelo de regresión lineal múltiple ajustado, se predice que la nota final esperada para un estudiante que estudia 4 horas diarias, utiliza herramientas de inteligencia artificial y tenía una nota previa de 70 puntos es aproximadamente 79.70 puntos.
 
 l.2 Predicción intervalar (Intervalo de Predicción)
+
+Para incorporar la variabilidad individual y la incertidumbre del modelo, se construye un intervalo de predicción al 95%.
 
 ```{r}
 predict(modelo, newdata = nuevo_estudiante,
