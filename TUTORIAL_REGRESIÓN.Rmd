@@ -661,7 +661,7 @@ En definitiva, el éxito del estudiante depende de conservar su base académica,
 
 k.  Estimación de una media (puntual e intervalar)
 
-El objetivo de esta sección es estimar la nota final promedio esperada de un grupo de estudiantes que presentan características específicas en las variables explicativas del modelo. A diferencia de la predicción individual, aquí se busca inferir el valor medio poblacional de la variable respuesta condicionado a ciertos valores de las variables independientes. Esta estimación se realiza utilizando el modelo de regresión lineal múltiple previamente ajustado, manteniendo constantes los coeficientes estimados y modificando únicamente los valores de las variables explicativas.
+El objetivo es estimar la nota final promedio esperada de un grupo de estudiantes que presentan características específicas en las variables explicativas del modelo. A diferencia de la predicción individual, aquí se busca inferir el valor medio poblacional de la variable respuesta condicionado a ciertos valores de las variables independientes. Esta estimación se realiza utilizando el modelo de regresión lineal múltiple previamente ajustado, manteniendo constantes los coeficientes estimados y modificando únicamente los valores de las variables explicativas.
 
 Paso 1: Definición del perfil promedio a evaluar
 
@@ -684,7 +684,8 @@ Estos valores no son arbitrarios, ya que:
 k.1 Estimación puntual de la media
 
 Paso 2: Construcción del nuevo conjunto de datos (media poblacional)
-Se crea un nuevo data.frame que representa el perfil promedio definido anteriormente.
+
+Construimos un nuevo data.frame que representa el perfil promedio definido anteriormente.
 
 ```{r}
 nuevo_promedio <- data.frame(
@@ -694,7 +695,7 @@ nuevo_promedio <- data.frame(
 )
 ```
 
-Se utiliza el modelo ajustado para obtener la estimación puntual de la nota final promedio correspondiente a este perfil.
+A partir del modelo ajustado, se obtiene la estimación puntual de la nota final promedio correspondiente a este perfil.
 
 ```{r}
 predict(modelo, newdata = nuevo_promedio)
@@ -704,7 +705,7 @@ La estimación puntual indica que la nota final promedio esperada para estudiant
 
 k.2 Estimación intervalar de la media (Intervalo de Confianza)
 
-Para cuantificar la incertidumbre asociada a la estimación de la media, se construye un intervalo de confianza al 95%.
+Para cuantificar la incertidumbre asociada a la estimación de la media, construimos un intervalo de confianza al 95%.
 
 ```{r}
 predict(modelo, newdata = nuevo_promedio,
@@ -717,11 +718,11 @@ Con un 95% de confianza, la nota final promedio de los estudiantes que estudian 
 
 l.  Predicción de un nuevo valor (puntual e intervalar)
 
-En esta sección se realiza la predicción de la nota final de un estudiante individual, considerando características específicas. A diferencia del apartado anterior, aquí se incorpora no solo la incertidumbre del modelo, sino también la variabilidad individual, por lo que se utiliza un intervalo de predicción.
+En esta sección se realiza la predicción de la nota final de un estudiante individual, considerando características específicas. A diferencia de la pregunta anterior, aquí se incorpora no solo la incertidumbre del modelo, sino también la variabilidad individual, por lo que se utiliza un intervalo de predicción.
 
 Paso 1: Selección y justificación del perfil del estudiante
 
-Se considera un estudiante con las siguientes características:
+Consideremos un estudiante con las siguientes características:
 
 -   Horas de estudio: 4 horas diarias
 
@@ -741,7 +742,7 @@ l.1 Predicción puntual
 
 Paso 2: Construcción del nuevo conjunto de datos (estudiante individual)
 
-Se define un nuevo data.frame que representa al estudiante individual a predecir.
+Se ingresa un nuevo data.frame que representa al estudiante individual a predecir.
 
 ```{r}
 nuevo_estudiante <- data.frame(
@@ -753,14 +754,14 @@ nuevo_estudiante <- data.frame(
 
 Paso 3: Predicción puntual del nuevo valor
 
-Se obtiene la predicción puntual de la nota final del estudiante utilizando el modelo ajustado.
+Aqui obtenemos la predicción puntual de la nota final del estudiante utilizando el modelo ajustado.
 
 ```{r}
 predict(modelo, newdata = nuevo_estudiante)
 
 ```
 
-Utilizando el modelo de regresión lineal múltiple ajustado, se predice que la nota final esperada para un estudiante que estudia 4 horas diarias, utiliza herramientas de inteligencia artificial y tenía una nota previa de 70 puntos es aproximadamente 79.70 puntos.
+Utilizando el modelo de regresión lineal múltiple ajustado, podemos  predecir que la nota final esperada para un estudiante que estudia 4 horas diarias, utiliza herramientas de inteligencia artificial y tenía una nota previa de 70 puntos es aproximadamente 79.70 puntos.
 
 l.2 Predicción intervalar (Intervalo de Predicción)
 
