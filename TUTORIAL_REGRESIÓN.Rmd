@@ -1,14 +1,50 @@
 ---
-title: "Tutorial básico de Regresión"
-author: 
-- "Lucia Fatima Carbajal Falcon"
-- "Arlette Alashka Carmen Tullume"
-- "Gabriel Omar Evaristo Jacinto"
+title: "Tutorial básico de Regresión: Impacto de la IA y el Estudio"
+author:
+- Lucia Fatima Carbajal Falcon
+- Arlette Alashka Carmen Tullume
+- Gabriel Omar Evaristo Jacinto
 date: "2026-01-26"
-output: html_document
+output:
+  html_document:
+    theme: lumen     
+    highlight: kate
+    toc: true
+    toc_float: true     
+    code_folding: show  
 ---
 
 ^1^ Universidad Nacional Agraria La Molina; ^2^ Departamento Estadística e Informática
+
+<style>
+/* Título principal (H1) */
+h1.title {
+  color: #6C3483; 
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+/* Subtítulos de secciones principales (##) */
+h2 {
+  color: #8E44AD; /* Morado medio */
+  border-bottom: 2px solid #EBDEF0; /* Línea lila claro */
+  padding-bottom: 5px;
+  margin-top: 40px;
+}
+
+/* Subtítulos de subsecciones (###) */
+h3 {
+  color: #A569BD; /* Morado suave */
+  font-style: italic;
+}
+
+/* Cambiar el color del índice flotante al pasar el mouse */
+.list-group-item.active, .list-group-item.active:focus, .list-group-item.active:hover {
+    background-color: #8E44AD;
+    border-color: #8E44AD;
+}
+</style>
 
 ## Introducción
 
@@ -42,7 +78,7 @@ b.  Objetivos de aprendizaje
 
 En la actualidad educativa, el uso de recursos de inteligencia artificial se ha popularizado entre los alumnos como un medio complementario para el aprendizaje y la ejecución de tareas académicas. Sin embargo, hay dudas respecto al verdadero efecto de estas tecnologías en el desempeño académico. Así, el objetivo de este tutorial es examinar cómo el uso de la inteligencia artificial se relaciona con el desempeño académico de los estudiantes, el cual se medirá a través de sus calificaciones posteriores, teniendo en cuenta además aspectos importantes como las horas dedicadas al estudio cada día y el rendimiento académico previo, utilizando un modelo de regresión lineal múltiple.
 
-b.  Origen del dataset: <https://www.kaggle.com/datasets/aminasalamt/students-ai-usage-and-academic-performance>
+$\bullet$ Origen del dataset: <https://www.kaggle.com/datasets/aminasalamt/students-ai-usage-and-academic-performance>
 
 ## Definición de variables
 
@@ -50,25 +86,25 @@ b.  Origen del dataset: <https://www.kaggle.com/datasets/aminasalamt/students-ai
 
 1.  **nota_despues**\
 
--   **Tipo:** Cuantitativa continua\
--   **Descripción:** Calificación final del estudiante tras el periodo de uso de herramientas de IA. Es la variable que deseamos predecir o explicar.
+-   Tipo: Cuantitativa continua\
+-   Descripción: Calificación final del estudiante tras el periodo de uso de herramientas de IA. Es la variable que deseamos predecir o explicar.
 
 #### Variables independientes
 
 1.  **horas_estudio**\
 
--   **Tipo:** Cuantitativa continua\
--   **Descripción:** Tiempo promedio diario (en horas) dedicado al estudio personal.
+-   Tipo: Cuantitativa continua\
+-   Descripción: Tiempo promedio diario (en horas) dedicado al estudio personal.
 
 2.  **usa_ia**\
 
--   **Tipo:** Cualitativa dicotómica (dummy)\
--   **Descripción:** Variable que indica si el estudiante utiliza herramientas de inteligencia artificial como apoyo en sus estudios (1 = sí, 0 = no).
+-   Tipo: Cualitativa dicotómica (dummy)\
+-   Descripción: Variable que indica si el estudiante utiliza herramientas de inteligencia artificial como apoyo en sus estudios (1 = sí, 0 = no).
 
 3.  **nota_antes**\
 
--   **Tipo:** Cuantitativa continua\
--   **Descripción:** Calificación obtenida por el estudiante antes del uso de herramientas de inteligencia artificial.
+-   Tipo: Cuantitativa continua\
+-   Descripción: Calificación obtenida por el estudiante antes del uso de herramientas de inteligencia artificial.
 
 ## Exploración de datos
 
@@ -76,7 +112,7 @@ b.  Origen del dataset: <https://www.kaggle.com/datasets/aminasalamt/students-ai
 
 Antes de ajustar un modelo de regresión, es fundamental conocer el comportamiento de las variables. La exploración de datos permite identificar valores atípicos, rangos plausibles, niveles de dispersión y posibles problemas que podrían afectar la validez del modelo.
 
-```{r}
+```{r, message=FALSE, warning=FALSE}
 # Cargar librerías
 library(dplyr)
 
@@ -104,160 +140,225 @@ datos$usa_ia <- factor(datos$usa_ia, levels = c("No", "Yes"), labels = c("No", "
 head(datos)
 ```
 
-b.  Resumen descriptivo univariado (además de realizar el resumen descriptivo, explicar por qué se hace)
+## <span style="text-decoration: underline; text-decoration-color: #8E44AD;">Resumen descriptivo univariado</span>
 
 El análisis univariado es el primer paso esencial para entender la distribución, tendencia central y dispersión de cada variable por separado. Nos permite identificar valores atípicos (outliers), errores de digitación o desequilibrios en las categorías (por ejemplo, si hay muy pocos estudiantes que "No" usan IA), lo cual podría afectar la validez del modelo de regresión posterior.
 
+$\bullet$ Variable Dependiente: Nota Final (nota_despues)
+
 ```{r}
-summary(datos$nota_despues)
-sd(datos$nota_despues)
+# Para comprender el comportamiento de la variable dependiente, no solo visualizamos su distribución, sino que calculamos sus estadísticos clave:
+
+# Estadístico de tendencia central
+summary(datos$horas_estudio)
+
+# Estadístico de dipersión
+sd(datos$horas_estudio)
+
+#Gráfico
 hist(datos$nota_despues,
-     col = "skyblue",
+     col = "#A569BD",
+     border = "white",
      main = "Distribución de la nota después",
-       xlab = "Nota final")
+     xlab = "Nota final",
+     ylab = "Frecuencia")
 ```
 
-Variable dependiente: nota_despues
+*La calificación final de los estudiantes presenta:*
 
-La calificación final de los estudiantes presenta:
+- Media: 68.7
 
-Media: 68.7
+- Mediana: 69
 
-Mediana: 69
+- Mínimo – Máximo: 55 a 89
 
-Mínimo – Máximo: 55 a 89
-
-Desviación estándar: 8.14
+- Desviación estándar: 8.14
 
 Esto indica que las notas finales se concentran alrededor de 69 puntos, con una dispersión moderada. Ademas permite ver cómo se distribuyen las calificaciones finales, si están concentradas en un rango específico y si la forma es aproximadamente simétrica.
 
+$\bullet$ Variable Independiente: Horas de Estudio (horas_estudio)
+
 ```{r}
+# Para comprender el comportamiento de la variable dependiente, no solo visualizamos su distribución, sino que calculamos sus estadísticos clave:
+
+# Estadístico de tendencia central
 summary(datos$horas_estudio)
+
+# Estadístico de dipersión
 sd(datos$horas_estudio)
+
+# Gráfico
 hist(datos$horas_estudio,
-     col = "lightgreen",
+     col = "#A569BD",
+     border = "white",
      main = "Distribución de horas de estudio por día",
-     xlab = "Horas de estudio")
+     xlab = "Horas de estudio",
+     ylab = "Frecuencia")
 ```
 
-Variable independiente: horas_estudio
+*Las horas de estudio diarias muestran:*
 
-Las horas de estudio diarias muestran:
+- Media: 2.99 horas
 
-Media: 2.99 horas
+- Mediana: 2.8 horas
 
-Mediana: 2.8 horas
+- Rango: 1 a 5 horas
 
-Rango: 1 a 5 horas
-
-Desviación estándar: 1.15
+- Desviación estándar: 1.15
 
 Los estudiantes estudian en promedio aproximadamente 3 horas al día. La dispersión es baja a moderada, lo que indica que la mayoría de estudiantes se concentra en un rango similar de tiempo de estudio, sin diferencias excesivas entre ellos.
 
+$\bullet$ Variable Independiente: Nota Anterior (nota_antes)
+
 ```{r}
+# Para comprender el comportamiento de la variable dependiente, no solo visualizamos su distribución, sino que calculamos sus estadísticos clave:
+
+# Estadístico de tendencia central
 summary(datos$nota_antes)
+
+# Estadístico de dipersión
 sd(datos$nota_antes)
+
+# Gráfico
 hist(datos$nota_antes,
-     col = "salmon",
+     col = "#A569BD",
+     border = "white",
      main = "Distribución de la nota antes",
-     xlab = "Nota previa")
+     xlab = "Nota previa",
+     ylab = "Frecuencia")
 ```
 
-El rendimiento previo presenta:
+**El rendimiento previo presenta:**
 
-Media: 64.77
+- Media: 64.77
 
-Mediana: 63
+- Mediana: 63
 
-Rango: 55 a 75
+- Rango: 55 a 75
 
-Desviación estándar: 6.17
+- Desviación estándar: 6.17
 
 Las calificaciones antes del uso de IA son ligeramente menores que las finales, lo que podría anticipar una mejora general en el desempeño. La variabilidad es moderada, lo que permite que esta variable aporte información relevante al modelo.
 
+$\bullet$ Variable Categórica: Uso de IA (usa_ia)
+
+Para esta variable, en lugar de un histograma, lo ideal es mencionar un conteo o gráfico de barras
+
 ```{r}
+# Frecuencia Absoluta
 table(datos$usa_ia)
+
+# Frecuencia Relativa
 prop.table(table(datos$usa_ia))
+
+# Gráfico
 barplot(table(datos$usa_ia),
-        col = c("gray70", "steelblue"),
+        col = c("#D2B4DE", "#7D3C98"), 
+        border = "white",             
         main = "Uso de herramientas de IA",
-        ylab = "Frecuencia")
+        ylab = "Frecuencia",
+        xlab = "¿Utiliza IA?",
+        ylim = c(0, max(table(datos$usa_ia)) + 5)) 
 ```
 
-Variable independiente categórica: usa_ia
+*La distribución del uso de inteligencia artificial es:*
 
-La distribución del uso de inteligencia artificial es:
+- No usa IA: 60 estudiantes (60%)
 
-No usa IA: 60 estudiantes (60%)
-
-Sí usa IA: 40 estudiantes (40%)
+- Sí usa IA: 40 estudiantes (40%)
 
 Las proporciones son relativamente equilibradas, lo cual es adecuado para el análisis, ya que ambos grupos tienen tamaños suficientes para comparar sus efectos en el modelo sin generar inestabilidad estadística.
 
-c.  Resumen descriptivo bivariado (además de realizar el resumen descriptivo, explicar por qué se hace)
+## <span style="text-decoration: underline; text-decoration-color: #8E44AD;">Resumen descriptivo bivariado</span>
 
 Se realiza para explorar preliminarmente la relación entre la variable respuesta ($Y$) y cada predictor ($X$). En regresión lineal, buscamos identificar visualmente si existe una tendencia lineal, la fuerza de la asociación y si la variable cualitativa (uses_ai) desplaza de manera evidente el promedio de las calificaciones. Esto justifica la inclusión de estas variables en el modelo final.
 
 1)  Horas de estudio vs Nota despues
 
 ```{r}
-plot(datos$horas_estudio, datos$nota_despues,
-     col = "darkgreen",
-     pch = 16,
-     xlab = "Horas de estudio por día",
-     ylab = "Nota después",
-     main = "Relación entre horas de estudio y nota final")
+# Gráfico de dispersión bivariado
+plot(datos$horas_estudio, datos$nota_despues, 
+     col = "#A569BD",     
+     pch = 16,          
+     xlab = "Horas de estudio por día", 
+     ylab = "Nota final", 
+     main = "Relación entre Horas de Estudio y Nota Final")
 
-abline(lm(nota_despues ~ horas_estudio, data = datos), col = "red", lwd = 2)
-cor(datos$horas_estudio, datos$nota_despues)
+# Línea de regresión lineal simple
+abline(lm(nota_despues ~ horas_estudio, data = datos), 
+       col = "#FF33FF",  
+       lwd = 3)           
 ```
 
-El diagrama de dispersión muestra la relación entre las horas de estudio diarias y la calificación final obtenida por los estudiantes. Visualmente, los puntos aparecen bastante dispersos y no se observa una tendencia lineal fuerte. La línea de regresión (en rojo) tiene una pendiente levemente positiva, pero muy pequeña. El coeficiente de correlación calculado es 0.075 el cual valor es muy cercano a 0, lo que indica una relación lineal positiva extremadamente débil entre las horas de estudio y la nota final. En términos prácticos, esto sugiere que, en este conjunto de datos, aumentar las horas de estudio no está fuertemente asociado con un incremento notable en la calificación después del uso de IA.
+* **Los Puntos ($\bullet$):** Representan a cada estudiante.
+* **La Línea de Tendencia:** Esta línea es una vista previa de nuestra regresión. Si sube de izquierda a derecha, indica una **correlación positiva**: a más horas de estudio, mayor nota esperada.
+* **Dispersión:** Observar qué tan cerca están los puntos de la línea nos da una idea visual de qué tan fuerte es la relación antes de calcular el $R^2$.
 
 2)  Nota antes vs Nota despues
 
 ```{r}
+# Gráfico de dispersión: Nota antes vs Nota después
 plot(datos$nota_antes, datos$nota_despues,
-     col = "purple",
+     col = "#A569BD",    
      pch = 16,
      xlab = "Nota antes",
      ylab = "Nota después",
-     main = "Relación entre nota previa y nota final")
+     main = "Relación entre Nota Previa y Nota Final")
 
-abline(lm(nota_despues ~ nota_antes, data = datos), col = "red", lwd = 2)
+# Línea de tendencia 
+abline(lm(nota_despues ~ nota_antes, data = datos), 
+       col = "#FF33FF",   
+       lwd = 3)           
+
+# Cálculo de la correlación
 cor(datos$nota_antes, datos$nota_despues)
 ```
 
-El diagrama de dispersión muestra una tendencia lineal positiva bien definida entre la calificación previa del estudiante y su calificación final. A medida que aumenta la nota antes, también aumenta la nota después. La línea de regresión (en rojo) refleja claramente esta pendiente ascendente. El coeficiente de correlación obtenido es 0.756 el cual indica una correlación lineal positiva fuerte. En términos prácticos, significa que los estudiantes que ya tenían un buen rendimiento académico tienden a mantener ese buen desempeño posteriormente.
+### ¿Por qué incluimos el `cor()` aquí?
+Como este es un **tutorial pedagógico**, es vital explicar que el número que sale al final (`cor`) es la traducción matemática de lo que vemos en el gráfico:
+
+- **Interpretación del Gráfico:** "Al ver que los puntos morados siguen de cerca la línea rosada, visualizamos que existe una relación lineal fuerte".
+
+- **Interpretación del `cor()`:** "El coeficiente de correlación de Pearson nos da un valor entre -1 y 1. Cuanto más cerca esté de 1, más fuerte es la relación positiva entre la base académica del alumno y su resultado final".
+
 
 3)  Uso de IA vs Nota despues
 
-```{r}
-boxplot(nota_despues ~ usa_ia, data = datos,
-        col = c("gray80", "skyblue"),
-        xlab = "Uso de IA",
-        ylab = "Nota después",
-        main = "Nota final según uso de IA")
+El diagrama de cajas permite comparar la distribución de las calificaciones finales entre los estudiantes que usan IA y los que no la usan.
 
+```{r}
+# Boxplot comparativo: Nota vs Uso de IA
+boxplot(nota_despues ~ usa_ia, data = datos,
+        col = c("#D2B4DE", "#7D3C98"), # Lila para 'No', Morado para 'Sí'
+        xlab = "¿Utiliza herramientas de IA?",
+        ylab = "Nota Final",
+        main = "Distribución de Notas según Uso de IA")
+
+# Cálculo de promedios por grupo
 tapply(datos$nota_despues, datos$usa_ia, mean)
 
 ```
 
-El diagrama de cajas permite comparar la distribución de las calificaciones finales entre los estudiantes que usan IA y los que no la usan.
+* **Comparación de Medianas:** La línea negra dentro de cada caja nos indica el valor central de las notas para cada grupo.
+* **Dispersión:** El tamaño de las cajas moradas nos permite ver qué grupo tiene notas más variadas.
 
-Se observa que:
+Si observamos un desplazamiento hacia arriba en el grupo "Sí", existe una relación positiva preliminar entre el uso de tecnología y el rendimiento. Esto indica que, de manera descriptiva, los estudiantes que utilizan herramientas de inteligencia artificial tienden a obtener mejores calificaciones finales en comparación con aquellos que no las utilizan.
 
-La mediana de las notas finales es claramente mayor en el grupo que sí usa IA.
+<span style="border-bottom: 2px solid #8E44AD;">Síntesis del Análisis Bivariado</span>
 
-La mayor parte de las calificaciones del grupo “Sí” se concentra en valores más altos que las del grupo “No”.
+Tras explorar la relación entre nuestra variable dependiente (Nota Final) y cada uno de los predictores, podemos concluir lo siguiente:
 
-Aunque existe cierta variabilidad en ambos grupos, la distribución completa del grupo que usa IA está desplazada hacia arriba.
+- Fuerza Académica: Existe una correlación positiva y marcada entre la Nota Anterior y el resultado final, lo que sugiere que la base previa es el predictor más sólido.
 
-Esto indica que, de manera descriptiva, los estudiantes que utilizan herramientas de inteligencia artificial tienden a obtener mejores calificaciones finales en comparación con aquellos que no las utilizan.
+- Impacto del Esfuerzo: El número de Horas de Estudio también muestra una tendencia ascendente, aunque con una dispersión que justifica un análisis más profundo mediante el modelo.
+
+- Efecto de la Tecnología: El análisis comparativo (boxplot) revela que el grupo que Sí usa IA mantiene una mediana de notas superior al grupo que no la utiliza.
+
+<div style="background-color: #F4ECF7; padding: 15px; border-radius: 10px; border: 1px solid #8E44AD; margin-top: 20px;"> Conclusión: Estos hallazgos visuales y numéricos (proporcionados por cor y tapply) nos dan la "luz verde" para proceder con la Regresión Lineal Múltiple. Al haber confirmado que todas las variables tienen una relación lógica con la nota, nuestro modelo final buscará cuantificar exactamente cuánto aporta cada factor al éxito del estudiante. </div>
 
 ## Modelamiento
 
-a.  Formulación del modelo
+## <span style="text-decoration: underline; text-decoration-color: #8E44AD;">Formulación del modelo</span>
 
 $$
 Y_i = \beta_0 + \beta_1 X_{1} + \beta_2 X_{2} + \beta_3 X_{3} + \varepsilon
@@ -279,24 +380,34 @@ Dónde:
 
 -   $\epsilon:$ error del modelo
 
-b.  Ajuste del modelo
+## <span style="text-decoration: underline; text-decoration-color: #8E44AD;">Ajuste del modelo</span>
 
 Se construye el modelo considerando como variable dependiente la nota final del estudiante y como variables explicativas las horas de estudio, el uso de IA y la nota previa.
 
 ```{r}
+# Creamos el modelo: Variable Respuesta ~ Predictores
 modelo = lm(nota_despues ~ horas_estudio + usa_ia + nota_antes, data = datos)
+
+# Vemos solo los Coeficientes (los Betas)
 modelo |> coef()
 ```
 
-Este comando indica que:
+### **¿Qué nos dice el comando `coef()`?**
 
-- nota_despues es la variable a explicar,
+Al ejecutar `modelo |> coef()`, R nos devuelve unos números llamados **Coeficientes ($\beta$)**. ¡Es lo que buscábamos!.
 
-- horas_estudio, usa_ia y nota_antes actúan como predictores,
+* **El Intercepto:** Es el punto de partida. Si todas las variables fueran cero, esta sería la nota base.
 
-el modelo se ajusta usando el método de mínimos cuadrados ordinarios.
+* **Los Betas ($\beta_i$):** Cada número te dice cuánto aumenta la nota final por cada unidad que sube esa variable. 
 
-c.  Interpretación de los coeficientes de regresión
+    * *Por ejemplo:* Si el coeficiente de `horas_estudio` es $0.5$, significa que por cada hora extra de estudio, ¡tu nota sube medio punto!.
+
+<div style="background-color: #F4ECF7; padding: 15px; border-radius: 10px; border: 1px solid #8E44AD; margin-top: 20px;">
+
+**Tip:** Fíjate bien en el signo de los coeficientes. Si es positivo ($+$), la variable ayuda a subir la nota; si es negativo ($-$), la variable la disminuye.
+</div>
+
+## <span style="text-decoration: underline; text-decoration-color: #8E44AD;">Interpretación de los coeficientes de regresión</span>
 
 $$\hat{Y}= 3.737 + 0.152X_1 + 9.925X_2 + 0.935X_3$$
 
@@ -308,9 +419,9 @@ $$\hat{Y}= 3.737 + 0.152X_1 + 9.925X_2 + 0.935X_3$$
 
 -   0.935: Por cada punto adicional que el estudiante tenía en su calificación previa, su nota final aumenta en 0.93 puntos manteniendo constante las horas de estudio y el uso de IA.
 
-d.  Coeficiente de determinación
+## <span style="text-decoration: underline; text-decoration-color: #8E44AD;">Coeficiente de determinación</span>
 
-El coeficiente de determinación $R^2$ mide qué proporción de la variabilidad de la variable dependiente (nota_despues) es explicada por el conjunto de variables independientes incluidas en el modelo: horas de estudio, uso de IA y nota previa.
+$\bullet$ El coeficiente de determinación $R^2$: Mide qué proporción de la variabilidad de la variable dependiente (nota_despues) es explicada por el conjunto de variables independientes incluidas en el modelo: horas de estudio, uso de IA y nota previa.
 
 ```{r}
 summary(modelo)$r.squared
@@ -318,51 +429,103 @@ summary(modelo)$r.squared
 
 Esto indica que aproximadamente el 92.8% de la variación en las calificaciones finales de los estudiantes puede ser explicada por las variables del modelo. Este es un valor muy alto, lo que sugiere que el modelo tiene un gran poder explicativo.
 
+$\bullet$ El coeficiente de determinación ajustado fue: $R^2_{ajustado}$: Nos indica si el modelo es realmente bueno o si solo se está amontonando variables
+
 ```{r}
 summary(modelo)$adj.r.squared
 ```
+Este valor es muy cercano al $R^2$, lo que indica que las variables incluidas son relevantes y que el modelo no está sobreajustado. Es decir, cada variable aporta información útil para explicar el rendimiento académico final.
 
-El coeficiente de determinación ajustado fue: $R^2_{ajustado}$ = 92.5% Este valor es muy cercano al $R^2$, lo que indica que las variables incluidas son relevantes y que el modelo no está sobreajustado. Es decir, cada variable aporta información útil para explicar el rendimiento académico final.
-
-e.  Verificación del supuesto de normalidad de errores
+## <span style="text-decoration: underline; text-decoration-color: #8E44AD;">Verificación del supuesto de normalidad de errores</span>
 
 Este supuesto establece que los residuos del modelo de regresión deben seguir aproximadamente una distribución normal. Su verificación es importante porque garantiza la validez de las pruebas de hipótesis y de los intervalos de confianza asociados a los coeficientes del modelo.
 
-```{r}
+```{r, warning=FALSE, message=FALSE}
+# Activamos la librería
 library(ggplot2)
+
 # Guardamos los residuales en un objeto
 res <- residuals(modelo)
 
-# Gráfico de Normalidad sugerido
+# Gráfico de Normalidad 
 data.frame(res) |>
   ggplot(aes(x = res)) +
-  geom_histogram(aes(y = ..density..),
-                 bins = round(1 + 3.3 * log10(nrow(datos))),
-                 fill = "dodgerblue2",
-                 alpha = 0.6) +
-  geom_density(size = 1.2, color = "darkblue") +
-  labs(title = "Distribución de Residuales",
-       subtitle = "Histograma con curva de densidad",
+  # Histograma en lila claro (coincide con los grupos 'No')
+  geom_histogram(aes(y = ..density..), 
+                 bins = round(1 + 3.3 * log10(nrow(datos))), 
+                 fill = "#D2B4DE", 
+                 alpha = 0.7) +
+  # Curva de densidad en morado fuerte (coincide con los grupos 'Sí')
+  geom_density(linewidth = 1.2, color = "#7D3C98") + 
+  labs(title = "Verificación de Normalidad",
+       subtitle = "Distribución de los residuales del modelo",
        x = "Residuales",
        y = "Densidad") +
-  theme_minimal()
+  theme_minimal() +
+  theme(plot.title = element_text(color = "#6C3483", face = "bold")) 
 
 ```
 
-En el análisis gráfico de los residuales, se observa una distribución aproximadamente simétrica. Sin embargo, la curva de densidad muestra una forma leptocúrtica (apuntamiento pronunciado), lo que sugiere que los errores están muy concentrados alrededor de la media.
+### ¿Cómo entendemos este gráfico?
+
+* **La forma de campana:** "Buscamos que el histograma lila siga la forma de la curva morada intensa. Si se parecen a una campana simétrica, nuestro supuesto de normalidad va por buen camino".
+
+* **El centro en cero:** "Los residuales deben estar centrados mayoritariamente en el 0, lo que indica que el modelo no se equivoca sistemáticamente hacia un lado".
+
+Para el conjunto de datos que estamos trabajando, observamos una distribución aproximadamente simétrica. Sin embargo, la curva de densidad muestra una forma leptocúrtica (apuntamiento pronunciado), lo que sugiere que los errores están muy concentrados alrededor de la media.
+
+> **Mini-Diccionario:** 
+> **Mesocúrtica:** Normal y equilibrada (Lo que buscamos).
+> **Leptocúrtica:** Muy punteaguda (Errores muy concentrados).
+> **Platicúrtica:** Muy plana (Errores muy dispersos).
 
 ```{r}
+# Activación de paquete
+library(ggplot2)
+
+# Gráfico de Probabilidad Normal (Q-Q Plot)
 data.frame(res) |>
-ggplot(aes(sample=res))+
-stat_qq(size = 2) +
-stat_qq_line(distribution = stats::qnorm)+
-labs(x = "Cuantil teórico", y = "Residuales")+
-theme_minimal()
+  ggplot(aes(sample = res)) +
+  stat_qq(size = 2, color = "#A569BD") + 
+  stat_qq_line(distribution = stats::qnorm, color = "#FF33FF", linewidth = 1) +
+  labs(title = "Gráfico Q-Q de Residuales",
+       subtitle = "Verificación visual de la alineación con la distribución normal",
+       x = "Cuantiles teóricos", 
+       y = "Residuales") +
+  theme_minimal() +
+  theme(plot.title = element_text(color = "#6C3483", face = "bold"))
 ```
 
-Al observar el gráfico Q-Q, se aprecia que la mayoría de los residuales se alinean con la diagonal teórica, especialmente en el sector central. No obstante, en los extremos se observa unalejamiento de los puntos, lo cual es coherente con la leptocurtosis detectada en el histograma.
+#### **¿Qué estamos viendo en este gráfico?**
 
--   Coeficiente de asimetría
+Imagina que la línea magenta es una **pista de aterrizaje** y los puntos morados son aviones:
+
+* **¿Qué es lo ideal?** Queremos que todos los puntos morados estén **encima o muy cerca** de la línea magenta. Si se alinean como soldados, podemos asegurar que nuestros residuales siguen una distribución normal.
+
+* **¿Qué pasa si se alejan en las puntas?** Si los puntos se curvan hacia arriba o hacia abajo al final de la línea (en las "colas"), significa que tenemos valores extremos o que nuestra campana es más ancha o flaca de lo normal.
+
+**¿Qué nos dicen las "puntas" del gráfico?**
+
+---
+
+<div style="background-color: #F4ECF7; padding: 15px; border-radius: 10px; border: 1px solid #8E44AD; margin-top: 20px;"> ¡Ojo con los extremos!
+
+- Puntas hacia afuera (Efecto "S"): Si los puntos se alejan de la línea en las esquinas formando una especie de "S", significa que tienes colas pesadas (distribución Leptocúrtica). ¡Hay más valores extremos de lo esperado!
+
+- Puntas que caen o suben rápido: Si los puntos se curvan alejándose mucho, podrías tener una distribución Platicúrtica (más plana que la normal).
+
+- Puntos rebeldes: Un solo puntito muy alejado en la punta es un Outlier. Ese estudiante tuvo un comportamiento tan raro que el modelo no pudo predecirlo bien.
+
+</div>
+
+---
+
+En nuestro conjunto de datos, podemos apreciar que la mayoría de los residuales se alinean con la diagonal, especialmente en el sector central. No obstante, en los extremos se observa un alejamiento de los puntos, lo cual es coherente con la leptocurtosis detectada en el histograma.
+
+
+A veces los ojos nos engañan, por eso usamos la estadística para confirmar si nuestra campana morada es realmente normal. Vamos a medir qué tan "chueca" está (Asimetría) y qué tan "puntiaguda" resulta (Curtosis).
+
+$\text{Subsección A: Análisis de la Asimetría}$
 
 $H_0: As = O$
 
@@ -371,13 +534,25 @@ $H_1: As \neq 0$
 $\alpha=0.5$
 
 ```{r}
+# Activamos la librería
 library(moments)
+
+## Realizamos el test de D'Agostino para asimetría
 res |> agostino.test()
 ```
+**Interpretación de los resultados:**
 
-Dado que el p-valor (0.4972) es notablemente mayor al nivel de significancia $\alpha = 0.05$, no se rechaza la hipótesis nula ($H_0$). Esto significa que no existe evidencia suficiente para afirmar que los errores son asimétricos. En términos estadísticos, los residuales presentan una simetría aceptable, lo cual es un indicio favorable para el cumplimiento del supuesto de normalidad.
+Dado que el p-valor es notablemente mayor al nivel de significancia $\alpha = 0.05$, no se rechaza la hipótesis nula ($H_0$). Esto significa que no existe evidencia suficiente para afirmar que los errores son asimétricos. En términos estadísticos, los residuales presentan una simetría aceptable, lo cual es un indicio favorable para el cumplimiento del supuesto de normalidad.
 
--   Curtosis
+---
+
+<div style="background-color: #F4ECF7; padding: 15px; border-left: 6px solid #8E44AD; border-radius: 5px;">
+**¿Qué significa ese p-valor tan alto?**. En estadística, un p-valor grande es como una "bandera blanca". Nos dice: "No hay pruebas para decir que algo anda mal". Como el 0.49 es mucho mayor que el 0.05 que pusimos de límite, aceptamos que nuestra campana está bien equilibrada.
+</div>
+
+---
+
+$\text{Subsección B: Curtosis}$
 
 $H_0: k = 3$
 
@@ -386,76 +561,159 @@ $H_1: k \neq 3$
 $\alpha=0.05$
 
 ```{r}
+# Prueba de Anscombe-Glynn para Curtosis
 res |> anscombe.test()
 ```
 
-Observamos que el p-valor (0.09991) es mayor que el nivel de significancia. Por lo tanto, no se rechaza la hipótesis nula (los datos son mesocúrticos).
+**Interpretación de los resultados:**
 
-**En conclusión, tras realizar las pruebas de D'Agostino y Anscombe-Glynn, se obtuvieron p-valores de 0.4972 y 0.0999 respectivamente. Dado que ambos son superiores al nivel de significancia** $\alpha = 0.05$, no se rechaza la hipótesis nula de simetría ni la de mesocurtosis. Por lo tanto, a pesar de las irregularidades visuales observadas en los gráficos, contamos con evidencia estadística suficiente para asumir el cumplimiento del supuesto de normalidad en los residuales del modelo.
+Observamos que el p-valor ($0.09991$) es mayor que nuestro nivel de significancia $\alpha = 0.05$. Por lo tanto, **no se rechaza la hipótesis nula**; esto indica que los datos son **mesocúrticos**.
 
--   Prueba de normalidad
+---
+
+<div style="background-color: #F4ECF7; padding: 15px; border-radius: 10px; border: 1px solid #8E44AD; margin-top: 20px;">
+**Conclusión** 
+
+Tras realizar las pruebas de **D'Agostino** (asimetría) y **Anscombe-Glynn** (curtosis), obtuvimos p-valores de $0.4972$ y $0.0999$ respectivamente. Como ambos son mayores a $0.05$, no rechazamos la simetría ni la mesocurtosis. 
+
+**En palabras simples:** Aunque en los gráficos veas algunas "arrugas" o puntos fuera de lugar, estadísticamente tus errores se comportan como una campana normal. 
+</div>
+
+---
+
+$\text{Subsección C: Prueba de Normalidad Global}$
+
+Finalmente, realizamos una prueba integral para determinar si el conjunto de los residuales se ajusta a una distribución normal. Para esto, utilizaremos el Test de Shapiro-Wilk, que es la prueba más potente para muestras de este tamaño.
 
 $H_0:$ los errores siguen una distribucion normal
 
 $H_1:$ los errores no siguen una distribucion normal
 
+$\alpha=0.05$
+
+
 ```{r}
+# Prueba de Shapiro-Wilk para los residuales
 res |> shapiro.test()
 ```
+**Interpretación:**
 
-"Al realizar la prueba de Shapiro-Wilk, se obtuvo un p-valor de $7.057 \times 10^{-7}$. Al ser menor al nivel de significancia $\alpha = 0.05$, se rechaza la hipótesis nula, concluyendo que los residuales no siguen una distribución normal. Esta falta de normalidad, impulsada por la marcada leptocurtosis observada en el histograma, sugiere que las inferencias del modelo deben tomarse con cautela.
+Al realizar la prueba de Shapiro-Wilk, se obtuvo un p-valor de $7.057 \times 10^{-7}$. Al ser mucho menor al nivel de significancia $\alpha = 0.05$, **se rechaza la hipótesis nula ($H_0$)**. Esto indica que, globalmente, los errores no siguen una distribución normal perfecta.
 
-**Al evaluar el supuesto de normalidad, se observa una discrepancia entre las pruebas. Por un lado, las pruebas de D’Agostino (**$p = 0.4972$) y Anscombe-Glynn ($p = 0.0999$) sugieren que los residuales mantienen niveles aceptables de simetría y curtosis. Sin embargo, la prueba de Shapiro-Wilk arroja un p-valor de $7.057 \times 10^{-7}$, rechazando la hipótesis nula de normalidad global. Esta sensibilidad de Shapiro-Wilk confirma que existen desviaciones en las colas de la distribución, como se aprecia en la forma de 'S' del gráfico Q-Q."
+Esta falta de normalidad, impulsada por la **leptocurtosis** que vimos antes, sugiere que las inferencias del modelo deben tomarse con cautela.
+
+---
+
+<div style="background-color: #F4ECF7; padding: 15px; border-left: 6px solid #8E44AD; border-radius: 5px;">
+**¿Por qué las pruebas no se ponen de acuerdo?**  
+
+Seguro notas que D’Agostino y Anscombe dicen que "todo bien", pero Shapiro-Wilk dice que "no". Esto pasa porque Shapiro es mucho más sensible a lo que pasa en las **colas de la distribución** (esos puntos que se alejaban en el Q-Q Plot formando una 's'). 
+
+</div>
+
+---
 
 f.  Verificación del supuesto de homocedasticidad de errores
 
 Este supuesto indica que la varianza de los residuos debe ser constante para todos los valores de la variable explicativa. Su cumplimiento asegura que las estimaciones de los coeficientes sean eficientes y que las inferencias estadísticas sean confiables.
 
+$\text{Subsección A: Análisis Visual (Residuales vs. Ajustados)}$
+Primero, observamos cómo se distribuyen los errores a lo largo de las predicciones:
+
 ```{r}
+# Gráfico de Residuales vs Valores Ajustados
 modelo |> plot(which=1)
 ```
 
-En la primera imagen, se observa que a medida que los valores ajustados aumentan (hacia la derecha en el eje X), la dispersión de los puntos se vuelve mucho mayor. Los puntos no forman una "banda horizontal" uniforme, sino que parecen abrirse en forma de embudo o abanico.
+En esta imagen, se observa que a medida que los valores ajustados aumentan (hacia la derecha en el eje X), la dispersión de los puntos se vuelve mucho mayor. Los puntos no forman una "banda horizontal" uniforme, sino que parecen abrirse en **forma de embudo o abanico**.
+
+$\text{Subsección B: Gráfico de Escala-Ubicación}$
 
 ```{r}
 modelo |> plot(which=3)
 ```
 
-En la segunda imagen, la línea roja tiene una tendencia ascendente marcada. Esto confirma que la magnitud de los residuos (la variabilidad) está creciendo junto con los valores predichos.
+Aquí, la línea roja tiene una tendencia ascendente marcada. Esto confirma que la magnitud de los residuos (la variabilidad) está creciendo junto con los valores predichos. Ambos gráficos sugieren la presencia de **heterocedasticidad** (varianza no constante).
+
+---
+
+### **¿Qué significa esto para nuestro modelo?**
+
+<div style="background-color: #F4ECF7; padding: 15px; border-radius: 10px; border: 1px solid #8E44AD; margin-top: 20px;">
+**Interpretación:** 
+
+La forma de "embudo" nos dice que nuestro modelo es muy bueno y preciso para predecir **notas bajas**, pero se vuelve "impreciso" o "ruidoso" cuando intenta predecir **notas altas**. 
+
+¿Por qué pasaría esto? Quizás los alumnos con notas bajas tienen comportamientos muy predecibles (pocas horas de estudio, no usan IA), mientras que en los alumnos destacados entran en juego otros factores que no estamos midiendo. 
+</div>
+
+---
 
 Ambos gráficos sugieren la presencia de heterocedasticidad (varianza no constante). Esto indica que el modelo es más preciso para predecir notas bajas que para predecir notas altas.
 
-```{r}
+$\text{Subsección C}$
+
+```{r, warning=FALSE, message=FALSE}
+# Activar librerías
 library(broom)
-# Usamos augment() para obtener los valores ajustados (.fitted) y los residuales (.resid)
+library(ggplot2)
+
+# Usamos augment() para obtener valores ajustados (.fitted) y residuales (.resid)
 modelo |> 
   augment() |> 
   ggplot(aes(x = .fitted, y = .resid)) +
-  geom_point(size = 3, color = "steelblue", alpha = 0.5) +
-  geom_hline(yintercept = 0, color = "red", linetype = "dashed") +
-  labs(x = "Valores ajustados (Puntaje de diagnóstico)",
-       y = "Residual",
-       title = "Evaluación de homocedasticidad",
-       subtitle = "Modelo: Desempeño académico con IA") +
+  geom_point(size = 3, color = "#A569BD", alpha = 0.5) +
+  geom_hline(yintercept = 0, color = "#FF33FF", linetype = "dashed", linewidth = 1) +
+  labs(x = "Valores Ajustados (Predicción de Nota)",
+       y = "Residual (Error)",
+       title = "Evaluación de Homocedasticidad",
+       subtitle = "Modelo: Desempeño académico e impacto de la IA") +
   theme_minimal()
 ```
 
 Existe heterocedasticidad. Visualmente, el gráfico tiene forma de "abanico" o "embudo". Esto nos dice que, aunque el modelo capta la tendencia general, hay factores adicionales que afectan a los alumnos destacados que no estamos logrando explicar solo con las horas de estudio o el uso de IA.
 
-```{r}
-# Usamos el modelo y la variable 'horas_estudio'
-modelo |> augment() |>
+---
+
+### **¿Qué estamos viendo aquí?**
+
+* **El patrón de "Abanico":** Como bien notaste, los puntos se abren a medida que avanzamos en el eje X. Esto confirma la **heterocedasticidad**.
+
+* **Interpretación:** Aunque el modelo capta la tendencia general, existen factores adicionales que afectan a los alumnos destacados que no estamos logrando explicar solo con las horas de estudio o el uso de IA.
+
+* **Consecuencia técnica:** Cuando hay heterocedasticidad, los errores estándar pueden estar sesgados, lo que significa que debemos tener cuidado al decir qué tan "seguros" estamos de nuestros resultados.
+
+---
+
+$\text{Subsección D}$
+
+```{r, warning=FALSE, message=FALSE}
+# Evaluamos si el error cambia según las horas de estudio
+modelo |> 
+  augment() |> 
   ggplot(aes(x = horas_estudio, y = .resid)) +
-  geom_point(size = 3, color = "darkorange", alpha = 0.7) +
-  geom_hline(yintercept = 0, color = "black", linetype = "solid") +
+  geom_point(size = 3, color = "#A569BD", alpha = 0.7) +
+  geom_hline(yintercept = 0, color = "#FF33FF", linetype = "solid") +
   labs(x = "Horas de estudio",
-       y = "Residual",
-       title = "Evaluación de homocedasticidad por variable",
+       y = "Residual (Error)",
+       title = "Evaluación de Homocedasticidad",
        subtitle = "Relación: Horas de estudio vs Residuales") +
   theme_minimal()
 ```
 
 Aunque el modelo identifica una tendencia, la heterocedasticidad detectada en la variable 'horas de estudio' sugiere que el impacto del estudio en la nota final es muy variable entre los alumnos destacados. Esto indica que nuestro modelo es útil, pero sus predicciones deben tomarse con cautela en el rango de alto rendimiento académico.
+
+---
+
+### **¿Cómo conectamos estos dos gráficos?**
+
+> **Conclusión del Análisis de Errores:** Al comparar el gráfico de **Valores Ajustados** con el de **Horas de Estudio**, notamos un patrón idéntico: a medida que aumentan tanto las horas como la nota predicha, los errores se vuelven más "locos" y dispersos (el famoso abanico). 
+>
+> **¿Qué nos dice esto sobre los datos?** Esto sugiere que el impacto del estudio en la nota final no es igual para todos. Para los alumnos de alto rendimiento, el tiempo de estudio es un predictor mucho más "ruidoso", probablemente porque a ese nivel intervienen otros factores (como la calidad del estudio o el uso de IA) que nuestro modelo aún no capta del todo.
+
+---
+
+$\text{Subsección E: Prueba Estadística de Homocedasticidad}$
 
 $H_0$: La varianza de los errores son constantes
 
@@ -463,53 +721,98 @@ $H_1$: La varianza de los errores no son constantes
 
 $\alpha = 0.05$
 
-```{r}
+```{r, message=FALSE}
+# Activar librería
 library(car)
-```
-
-```{r}
 modelo |> ncvTest()
 ```
 
-Se rechaza la hipotesis nula, por lo tanto no se verifica el supuesto de homogeneidad de varianza de los errores
+**Interpretación**
+
+Al ejecutar la prueba, obtenemos un p-valor de $2.671 \times 10^{-11}$. Al ser este valor extremadamente pequeño (mucho menor a $0.05$), **se rechaza la hipótesis nula ($H_0$)**. Por lo tanto, confirmamos estadísticamente la presencia de **heterocedasticidad** en nuestro modelo de notas.
+
+---
+
+> **Conclusión General del Supuesto:** Los gráficos nos mostraron un abanico, el análisis por variable señaló a las "Horas de estudio" como la fuente de confusión, y ahora la prueba `ncvTest` pone el sello final: la varianza no es constante. 
+
+> **¿Qué significa esto?** Significa que nuestro modelo es "inestable" en los extremos. Aunque nos da una buena idea general de cómo influye la IA y el estudio, no podemos confiar plenamente en los intervalos de confianza para los alumnos de más alto rendimiento, ya que sus errores son mucho más variables e impredecibles.
+
+---
 
 g.  Verificación del supuesto de independencia de errores
 
 Este supuesto establece que los errores del modelo no deben estar correlacionados entre sí. Su verificación es fundamental para evitar sesgos en la estimación de los coeficientes y en las pruebas estadísticas.
 
-```{r}
+$\text{Subsección A: Análisis de Secuencia de Residuos}$
+
+Para detectar si existe un patrón temporal o de orden en los datos, graficamos los residuales en el orden en que fueron recolectados
+
+```{r, message=FALSE, warning=FALSE}
 # Usamos los residuales de tu modelo (res) y el total de datos
-data.frame(res) |>
+data.frame(res) |> 
   ggplot(aes(x = 1:nrow(datos), y = res)) +
-  geom_point(size = 1.5, color = "darkgreen") +
-  geom_line(alpha = 0.3) +
-  geom_hline(yintercept = 0, color = "red", linetype = "dashed") +
-  labs(x = "Orden de observación", 
-       y = "Residual", 
+  geom_point(size = 1.5, color = "#A569BD") + # Morado para mantener el estilo
+  geom_line(alpha = 0.3, color = "#A569BD") +
+  geom_hline(yintercept = 0, color = "#FF33FF", linetype = "dashed") +
+  labs(x = "Orden de observación",
+       y = "Residual",
        title = "Evaluación de independencia",
        subtitle = "Gráfico de secuencia de residuos") +
   theme_minimal()
 ```
+**Interpretación**
 
 El gráfico de secuencia de residuos no muestra patrones sistemáticos, lo que indicaría que las observaciones son independientes entre sí.
 
-```{r}
-library(ggfortify)
-```
+---
 
-```{r}
+<div style="background-color: #F4ECF7; padding: 15px; border-left: 6px solid #8E44AD; border-radius: 5px;"> Para leer este gráfico de secuencia:
+
+Si parece un "garabato" sin sentido: Los puntos saltan de arriba a abajo de forma caótica. Esto significa que lo que pasó en la encuesta anterior no influye en la siguiente. Los errores son independientes.
+
+Si parece una "serpiente" o una escalera: Si ves que los puntos forman ondas, una línea que sube o que baja, significa que hay un patrón. Eso indicaría que tus datos están correlacionados y el supuesto fallaría.
+
+</div>
+
+---
+
+$\text{Subsección B: Análisis de Autocorrelación (ACF)}$
+
+Para verificar la independencia de forma más rigurosa, generamos un Correlograma o gráfico de la Función de Autocorrelación (ACF). Este gráfico nos ayuda a detectar si existe una dependencia lineal entre residuos consecutivos.
+
+```{r, message=FALSE, warning=FALSE}
+# Activar librería
+library(ggfortify)
 # Usamos los residuales de tu modelo
 res |> 
   TSA::acf(lag = 18, plot = F) |> 
-  autoplot() + 
-  labs(x = "Desfase (Lag)", 
-       y = "Autocorrelación", 
+  autoplot() +
+  labs(x = "Desfase (Lag)",
+       y = "Autocorrelación",
        title = "Evaluación de independencia (ACF)",
-       subtitle = "Gráfico de Autocorrelación de los Residuales") + 
+       subtitle = "Gráfico de Autocorrelación de los Residuales") +
   theme_minimal()
 ```
 
 Para verificar la independencia de los errores, se generó un correlograma (ACF). Se observa que casi la totalidad de las barras de autocorrelación se encuentran dentro de las bandas de confianza (líneas azules), a excepción de una ligera desviación en el primer desfase. Esto sugiere que no existe una dependencia lineal significativa entre los residuos consecutivos, cumpliéndose de manera razonable el supuesto de independencia necesario para la validez del modelo.
+
+**Interpretación**
+
+Como se observa en el gráfico, casi la totalidad de las barras de autocorrelación se encuentran dentro de las **bandas de confianza** (las líneas azules punteadas). Esto sugiere que no existe una dependencia significativa entre los residuos a través del tiempo o el orden de los datos, cumpliéndose de manera razonable el supuesto de independencia necesario para la validez del modelo.
+
+---
+
+<div style="background-color: #F4ECF7; padding: 15px; border-left: 6px solid #8E44AD; border-radius: 5px;">
+**¿Cómo leer este gráfico?** 
+
+* **Si las barras se salen:** Hay una correlación (como una serpiente que sigue un camino).
+* **Si se quedan dentro:** Es el caos que buscamos. ¡Independencia confirmada!.
+</div>
+
+---
+
+
+- Usamos prueba de hipótesis para verificar la independencia con Durbin Watson
 
 $H_0$: Los errores son independientes
 
@@ -518,6 +821,7 @@ $H_1$: Los errores no son independientes
 $\alpha = 0.05$
 
 ```{r}
+# Activar librería
 library(car)
 modelo |> 
   durbinWatsonTest(alternative = "two.sided",
@@ -525,9 +829,21 @@ modelo |>
                    reps = 1e5)
 ```
 
-Para validar el supuesto de independencia, se aplicó la prueba de Durbin-Watson extendida hasta 10 retardos. Los resultados muestran que para todos los niveles de desfase, los p-valores son superiores al nivel de significancia $\alpha = 0.05$ (p-valor lag 1 = 0.062). Al no rechazar la hipótesis nula, se concluye que no existe autocorrelación significativa en los residuales. Este hallazgo es consistente con el gráfico ACF, confirmando que el modelo cumple con el supuesto de independencia necesario para la inferencia estadística.
+**Interpretación de la Tabla de Resultados:**
 
-***Aunque se detectó falta de normalidad y heterocedasticidad, lo cual sugeriría una transformación de variables, se ha decidido proceder con los datos originales para mantener la interpretabilidad pedagógica del tutorial. No obstante, se incluye una Nota de Precaución indicando que las inferencias (pruebas*** $t$ y $F$) podrían presentar ligeras desviaciones.
+Como se observa en la salida, **todos los p-valores son superiores a 0.05** (el valor para el lag 1 es $0.062$, raspando pero suficiente). Al no rechazar la hipótesis nula, concluimos que no existe autocorrelación significativa en los residuales. Este hallazgo es consistente con nuestro gráfico ACF, confirmando que el modelo cumple con el supuesto de independencia.
+
+---
+
+<div style="background-color: #F4ECF7; padding: 15px; border-left: 6px solid #8E44AD; border-radius: 5px;">
+**¡Atención!** 
+
+Aunque hemos validado la **Independencia**, recuerda que en las secciones anteriores detectamos falta de **Normalidad** y presencia de **Heterocedasticidad**. 
+
+**¿Por qué seguir adelante?** En este tutorial decidimos mantener los datos originales para que los resultados sean fáciles de interpretar y aprender. Sin embargo, en un proyecto real de alto rigor, esto sugeriría que deberíamos transformar las variables (como usar logaritmos) o usar modelos más complejos. 
+</div>
+
+---
 
 i)  Prueba de hipótesis global
 
@@ -539,7 +855,7 @@ $H_1:$ Al menos un $\beta_j \neq 0$ : Al menos una de las variables tiene un efe
 
 $\alpha=0.05$
 
-```{r}
+```{r, message=FALSE, warning=FALSE}
 library(broom)
 # Usamos las variables: nota_despues (Y), horas_estudio, usa_ia y nota_antes (X's)
 
@@ -571,9 +887,9 @@ Paso 1: Formular las Hipótesis
 
 ¿Es posible que la nota final aumente exactamente en la misma proporción (1 a 1) que la nota inicial?
 
-$H_0: \beta_{\text{nota_antes}} = 1$
+$H_0: \beta_{\text{nota\_antes}} = 1$
 
-$H_1: \beta_{\text{nota_antes}} \neq 1$
+$H_1: \beta_{\text{nota\_antes}} \neq 1$
 
 Paso 2: Calculamos el estadístico de prueba
 
@@ -601,9 +917,9 @@ Al comparar el t-crítico con el t-calculado, no rechazamos $H_0$. Esto signific
 
 Paso 1: Formular las Hipótesis
 
-$H_0: \beta_{\text{horas_estudio}} = 1.5$
+$H_0: \beta_{\text{horas\_estudio}} = 1.5$
 
-$H_1: \beta_{\text{horas_estudio}} \neq 1.5$
+$H_1: \beta_{\text{horas\_estudio}} \neq 1.5$
 
 Paso 2: Calculamos el estadístico de prueba
 
@@ -631,9 +947,9 @@ Un informe previo indica que el uso de IA mejora las notas en 5 puntos. ¿Los da
 
 Paso 1: Formular las Hipótesis
 
-$H_0: \beta_{\text{usa_ia}} = 5$
+$H_0: \beta_{\text{usa\_ia}} = 5$
 
-$H_1: \beta_{\text{usa_ia}} \neq 5$
+$H_1: \beta_{\text{usa\_ia}} \neq 5$
 
 Paso 2: Calculamos el estadístico de prueba
 
@@ -681,7 +997,7 @@ Estos valores no son arbitrarios, ya que:
 
 -   El uso de IA es una categoría relevante y ampliamente representada en la muestra.
 
-k.1 Estimación puntual de la media
+k.1) Estimación puntual de la media
 
 Paso 2: Construcción del nuevo conjunto de datos (media poblacional)
 
@@ -703,7 +1019,7 @@ predict(modelo, newdata = nuevo_promedio)
 
 La estimación puntual indica que la nota final promedio esperada para estudiantes que estudian 3 horas diarias, utilizan herramientas de inteligencia artificial y tenían una nota previa de 65 es 74.87 puntos.
 
-k.2 Estimación intervalar de la media (Intervalo de Confianza)
+k.2) Estimación intervalar de la media (Intervalo de Confianza)
 
 Para cuantificar la incertidumbre asociada a la estimación de la media, construimos un intervalo de confianza al 95%.
 
@@ -738,7 +1054,7 @@ Estos valores son coherentes porque:
 
 -   Permiten analizar el comportamiento del modelo en un nivel superior al promedio.
 
-l.1 Predicción puntual
+l.1) Predicción puntual
 
 Paso 2: Construcción del nuevo conjunto de datos (estudiante individual)
 
@@ -763,7 +1079,7 @@ predict(modelo, newdata = nuevo_estudiante)
 
 Utilizando el modelo de regresión lineal múltiple ajustado, podemos  predecir que la nota final esperada para un estudiante que estudia 4 horas diarias, utiliza herramientas de inteligencia artificial y tenía una nota previa de 70 puntos es aproximadamente 79.70 puntos.
 
-l.2 Predicción intervalar (Intervalo de Predicción)
+l.2) Predicción intervalar (Intervalo de Predicción)
 
 Para incorporar la variabilidad individual y la incertidumbre del modelo, se construye un intervalo de predicción al 95%.
 
