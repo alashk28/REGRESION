@@ -1,5 +1,5 @@
 ---
-title: "Tutorial básico de Regresión: Impacto de la IA y el Estudio"
+title: 'Tutorial básico de Regresión: Impacto de la IA y el Estudio'
 author:
 - Lucia Fatima Carbajal Falcon
 - Arlette Alashka Carmen Tullume
@@ -7,11 +7,13 @@ author:
 date: "2026-01-26"
 output:
   html_document:
-    theme: lumen     
+    theme: lumen
     highlight: kate
     toc: true
-    toc_float: true     
-    code_folding: show  
+    toc_float: true
+    code_folding: show
+  pdf_document:
+    toc: true
 ---
 
 ^1^ Universidad Nacional Agraria La Molina; ^2^ Departamento Estadística e Informática
@@ -613,7 +615,7 @@ Seguro notas que D’Agostino y Anscombe dicen que "todo bien", pero Shapiro-Wil
 
 ---
 
-f.  Verificación del supuesto de homocedasticidad de errores
+## <span style="text-decoration: underline; text-decoration-color: #8E44AD;">Verificación del supuesto de homocedasticidad de errores</span>
 
 Este supuesto indica que la varianza de los residuos debe ser constante para todos los valores de la variable explicativa. Su cumplimiento asegura que las estimaciones de los coeficientes sean eficientes y que las inferencias estadísticas sean confiables.
 
@@ -739,7 +741,7 @@ Al ejecutar la prueba, obtenemos un p-valor de $2.671 \times 10^{-11}$. Al ser e
 
 ---
 
-g.  Verificación del supuesto de independencia de errores
+## <span style="text-decoration: underline; text-decoration-color: #8E44AD;">Verificación del supuesto de independencia de errores</span>
 
 Este supuesto establece que los errores del modelo no deben estar correlacionados entre sí. Su verificación es fundamental para evitar sesgos en la estimación de los coeficientes y en las pruebas estadísticas.
 
@@ -845,13 +847,15 @@ Aunque hemos validado la **Independencia**, recuerda que en las secciones anteri
 
 ---
 
-i)  Prueba de hipótesis global
+## <span style="text-decoration: underline; text-decoration-color: #8E44AD;">Significancia del Modelo de Regresión</span>
 
-Una vez ajustado el modelo, es necesario verificar si este tiene capacidad predictiva global. La Prueba de Hipótesis Global utiliza el estadístico F para determinar si existe una relación lineal entre la variable respuesta y el conjunto de variables explicativas.
+### **i) Prueba de hipótesis global**
 
-$H_0: \beta_0 = \beta_1 = \beta_2 = \beta_3 =0:$ Ninguna de las variables explicativas influye linealmente en la nota después.
+Una vez ajustado el modelo, es necesario verificar si este tiene capacidad predictiva global. La Prueba de Hipótesis Global utiliza el estadístico F para determinar si existe una relación lineal entre la variable respuesta ($Y$) y el conjunto de variables explicativas ($X_k$)
 
-$H_1:$ Al menos un $\beta_j \neq 0$ : Al menos una de las variables tiene un efecto significativo sobre la nota después.
+$H_0: \beta_0 = \beta_1 = \beta_2 = \beta_3 =0$ (Ninguna de las variables explicativas influye linealmente en la nota después).
+
+$H_1:$ Al menos un $\beta_j \neq 0$ (Al menos una de las variables tiene un efecto significativo sobre la nota después).
 
 $\alpha=0.05$
 
@@ -864,26 +868,36 @@ anova = aov(nota_despues ~ X, datos) |> tidy()
 anova
 ```
 
-Se observa que el p-valor es mucho menor que el alpha, por lo tanto, se rechaza H0, entonces podemos concluir que al menos una de las variables tienen un efecto significativo sobre la variable respuesta (nota_despues).
+**Interpretación de resultados:**
 
-**"A pesar de la significancia global observada en esta prueba F, recordamos que las inferencias deben tomarse con cautela debido a la falta de normalidad en los errores"**
+Se observa que el p-valor ($1.45 \times 10^{-54}$) es extremadamente menor que el alpha ($\alpha = 0.05$), por lo tanto, **se rechaza $H_0$**. Esto nos permite concluir con total seguridad que el modelo es globalmente significativo; es decir, al menos una de nuestras variables (horas de estudio, uso de IA o nota previa) explica de manera importante la nota final de los estudiantes.
 
-j). Pruebas de hipótesis individuales
+---
 
-Esta prueba evalúa si cada variable independiente, de manera individual, tiene un efecto significativo sobre la nota final, manteniendo las demás constantes.
+<div style="background-color: #F4ECF7; padding: 15px; border-left: 6px solid #8E44AD; border-radius: 5px;">
+**¡Atención!** 
 
-Una vez que sabemos que el modelo es útil globalmente, el siguiente paso es analizar cada variable por separado. ¿Realmente cada una aporta al modelo? Para esto, realizamos una Prueba t.
+Aunque el p-valor sea casi cero y el modelo parezca "perfecto", recuerda lo que descubrimos en los supuestos: **los errores no son normales y hay heterocedasticidad**. 
 
-Definimos el modelo
+**Tomar en cuenta:** A pesar de la alta significancia global observada en esta prueba $F$, las inferencias y proyecciones deben tomarse con cautela. ¡Es potente, pero hay que manejarlo con cuidado!.
+</div>
+
+---
+
+### **ii) Pruebas de hipótesis individuales**
+
+Esta prueba evalúa si cada variable independiente, de manera individual, tiene un efecto significativo sobre la nota final, manteniendo las demás constantes. Una vez que sabemos que el modelo es útil globalmente, el siguiente paso es analizar si cada parámetro $\beta_j$ aporta información valiosa al modelo mediante una Prueba $t$.
+
+**Definimos el modelo**
 
 ```{r}
 modelo2 = lm(nota_despues ~ horas_estudio + usa_ia + nota_antes, datos)
 modelo2 |> tidy()
 ```
 
-Paso 1: Formular las Hipótesis
+$\text{Variable 1: Nota Inicial (Efecto Proporcional)}$
 
--   Variable: nota_antes
+*Paso 1: Formular las Hipótesis*
 
 ¿Es posible que la nota final aumente exactamente en la misma proporción (1 a 1) que la nota inicial?
 
@@ -891,7 +905,7 @@ $H_0: \beta_{\text{nota\_antes}} = 1$
 
 $H_1: \beta_{\text{nota\_antes}} \neq 1$
 
-Paso 2: Calculamos el estadístico de prueba
+*Paso 2: Calculamos el estadístico de prueba*
 
 $$t_{calc}=\frac{0.935-1}{0.037}$$
 
@@ -899,7 +913,7 @@ $$t_{calc}=\frac{0.935-1}{0.037}$$
 (0.935-1)/0.037
 ```
 
-Paso 3: Calculamos el t-critico, al ser una prueba bilateral, definimos t-crítico para un 95% de confianza (alpha = 0.05) para los 2 lados.
+*Paso 3: Calculamos el t-critico, al ser una prueba bilateral, definimos t-crítico para un 95% de confianza (alpha = 0.05) para los 2 lados.*
 
 ```{r}
 qt(0.025, 96)
@@ -909,19 +923,21 @@ qt(0.025, 96)
 qt(0.975, 96)
 ```
 
+*Veredicto*
+
 Al comparar el t-crítico con el t-calculado, no rechazamos $H_0$. Esto significa que sí se puede afirmar que existe una relación de 1 a 1 entre la nota inicial y la final, confirmando que la base académica previa se mantiene de forma exacta en el resultado.
 
--   Variable: horas_estudio
+$\text{Variable 2: Horas de Estudio}$
 
 ¿Se puede afirmar que por cada hora adicional de estudio, la nota final aumenta en 1.5 puntos, manteniendo lo demás constante?
 
-Paso 1: Formular las Hipótesis
+*Paso 1: Formular las Hipótesis*
 
 $H_0: \beta_{\text{horas\_estudio}} = 1.5$
 
 $H_1: \beta_{\text{horas\_estudio}} \neq 1.5$
 
-Paso 2: Calculamos el estadístico de prueba
+*Paso 2: Calculamos el estadístico de prueba*
 
 $$t_{calc}=\frac{0.152-1.5}{0.200}$$
 
@@ -929,7 +945,7 @@ $$t_{calc}=\frac{0.152-1.5}{0.200}$$
 (0.152-1.5)/0.200
 ```
 
-Paso 3: Calculamos el t-critico, al ser una prueba bilateral, definimos t-crítico para un 95% de confianza (alpha = 0.05) para los 2 lados.
+*Paso 3: Calculamos el t-critico, al ser una prueba bilateral, definimos t-crítico para un 95% de confianza (alpha = 0.05) para los 2 lados.*
 
 ```{r}
 qt(0.025, 96)
@@ -939,19 +955,21 @@ qt(0.025, 96)
 qt(0.975, 96)
 ```
 
+*Veredicto*
+
 Al comparar el t-crítico con el t-calculado, rechazamos $H_0$.Esto significa que no se puede afirmar que cada hora adicional de estudio incremente la nota exactamente en 1.5 puntos.
 
--   Variable: usa_ia
+$\text{Variable 3: Uso de IA}$
 
 Un informe previo indica que el uso de IA mejora las notas en 5 puntos. ¿Los datos actuales permiten afirmar que el impacto es distinto a esos 5 puntos?
 
-Paso 1: Formular las Hipótesis
+*Paso 1: Formular las Hipótesis*
 
 $H_0: \beta_{\text{usa\_ia}} = 5$
 
 $H_1: \beta_{\text{usa\_ia}} \neq 5$
 
-Paso 2: Calculamos el estadístico de prueba
+*Paso 2: Calculamos el estadístico de prueba*
 
 $$t_{calc}=\frac{-9.925-5}{0.459}$$
 
@@ -959,7 +977,7 @@ $$t_{calc}=\frac{-9.925-5}{0.459}$$
 (-9.925-5)/0.459
 ```
 
-Paso 3: Calculamos el t-critico, al ser una prueba bilateral, definimos t-crítico para un 95% de confianza (alpha = 0.05) para los 2 lados.
+*Paso 3: Calculamos el t-critico, al ser una prueba bilateral, definimos t-crítico para un 95% de confianza (alpha = 0.05) para los 2 lados.*
 
 ```{r}
 qt(0.025, 96)
@@ -969,17 +987,31 @@ qt(0.025, 96)
 qt(0.975, 96)
 ```
 
+*Veredicto*
+
 Al comparar el t-crítico con el t-calculado, rechazamos $H_0$. Por lo tanto podemos concluir que existe evidencia estadística suficiente para afirmar que el uso de IA tiene un efecto diferente a 5 puntos.
+
+---
+
+<div style="background-color: #F4ECF7; padding: 15px; border-radius: 10px; border: 1px solid #8E44AD; margin-top: 20px;">
+**Interpretación Final del Análisis Individual** 
 
 En definitiva, el éxito del estudiante depende de conservar su base académica, pero se ve potenciado principalmente por el uso de herramientas tecnológicas, el cual supera en efectividad al incremento de horas de estudio tradicional.
 
-***Podemos concluir que o todas las variables se comportan como predecimos: mientras que la base académica es una constante predecible (1 a 1), la IA y las horas de estudio requieren un análisis más profundo al alejarse de los estándares teóricos de 5 y 1.5 puntos respectivamente***
+Podemos concluir que no todas las variables se comportan como predecimos: mientras que la base académica es una constante predecible ($1$ a $1$), la IA y las horas de estudio requieren un análisis más profundo al alejarse de los estándares teóricos de $5$ y $1.5$ puntos respectivamente. 
+</div>
 
-k.  Estimación de una media (puntual e intervalar)
+--- 
 
-El objetivo es estimar la nota final promedio esperada de un grupo de estudiantes que presentan características específicas en las variables explicativas del modelo. A diferencia de la predicción individual, aquí se busca inferir el valor medio poblacional de la variable respuesta condicionado a ciertos valores de las variables independientes. Esta estimación se realiza utilizando el modelo de regresión lineal múltiple previamente ajustado, manteniendo constantes los coeficientes estimados y modificando únicamente los valores de las variables explicativas.
+## <span style="text-decoration: underline; text-decoration-color: #8E44AD;">Inferencia y Predicción del Modelo</span>
 
-Paso 1: Definición del perfil promedio a evaluar
+### **ii) Pruebas de hipótesis individuales**
+
+$\text{Subsección A: Estimación de la Media Poblacional } E(Y|X)$
+
+El objetivo es estimar la nota final promedio esperada de un grupo de estudiantes con características específicas. A diferencia de la predicción individual, aquí buscamos el valor medio de la población condicionado a ciertos valores de las variables independientes.
+
+*Paso 1: Definición del perfil promedio a evaluar*
 
 Para la estimación de la media, se consideran los siguientes valores:
 
@@ -989,6 +1021,11 @@ Para la estimación de la media, se consideran los siguientes valores:
 
 -   Nota previa: 65 puntos
 
+---
+
+<div style="background-color: #F4ECF7; padding: 15px; border-left: 6px solid #8E44AD; border-radius: 5px;">
+**Tomar en cuenta:** 
+
 Estos valores no son arbitrarios, ya que:
 
 -   3 horas de estudio corresponde aproximadamente al promedio observado en el dataset.
@@ -996,10 +1033,11 @@ Estos valores no son arbitrarios, ya que:
 -   65 puntos es un valor cercano a la media de la variable nota_antes.
 
 -   El uso de IA es una categoría relevante y ampliamente representada en la muestra.
+</div>
 
-k.1) Estimación puntual de la media
+---
 
-Paso 2: Construcción del nuevo conjunto de datos (media poblacional)
+*Paso 2: Construcción del nuevo conjunto de datos (media poblacional)*
 
 Construimos un nuevo data.frame que representa el perfil promedio definido anteriormente.
 
@@ -1017,26 +1055,46 @@ A partir del modelo ajustado, se obtiene la estimación puntual de la nota final
 predict(modelo, newdata = nuevo_promedio)
 ```
 
-La estimación puntual indica que la nota final promedio esperada para estudiantes que estudian 3 horas diarias, utilizan herramientas de inteligencia artificial y tenían una nota previa de 65 es 74.87 puntos.
+**Interpretación:**
+La estimación puntual indica que la nota final promedio esperada para este perfil de estudiantes es de **74.87 puntos**.
 
-k.2) Estimación intervalar de la media (Intervalo de Confianza)
+---
 
-Para cuantificar la incertidumbre asociada a la estimación de la media, construimos un intervalo de confianza al 95%.
+<div style="background-color: #F4ECF7; padding: 15px; border-left: 6px solid #8E44AD; border-radius: 5px;">
+**¡Dato clave!**
+
+1.  **Estimación de la Media (Confidence Interval):** Responde a "¿Cuál es la nota promedio de **todos** los que estudian 3 horas y usan IA?". Es un valor más estable porque los errores individuales se compensan.
+2.  **Predicción Individual (Prediction Interval):** Responde a "¿Qué nota sacará **Juan**, que estudia 3 horas y usa IA?". Este intervalo siempre será mucho más ancho porque predecir a una sola persona es mucho más difícil que predecir a un grupo.
+</div>
+
+---
+
+$\text{Subsección B: Estimación intervalar de la media (Intervalo de Confianza)}$
+
+Para cuantificar la incertidumbre asociada a la estimación de la media, construimos un **Intervalo de Confianza al 95%**. Este intervalo representa el rango donde esperamos que se encuentre el verdadero promedio poblacional para estudiantes con el perfil definido.
 
 ```{r}
 predict(modelo, newdata = nuevo_promedio,
         interval = "confidence", level = 0.95)
 ```
 
-Con un 95% de confianza, la nota final promedio de los estudiantes que estudian 3 horas diarias, utilizan herramientas de inteligencia artificial y tenían una nota previa de 65 puntos se encuentra entre 74.17 y 75.57 puntos.
+**Interpretación del Intervalo:**
 
-**"Aunque el modelo presenta un alto poder explicativo, se ha detectado la presencia de heterocedasticidad y desviaciones de la normalidad en los errores. Por tal motivo, el intervalo de confianza para la media debe interpretarse con cautela, ya que la varianza no constante puede afectar la precisión de la inferencia estadística. No obstante, la estimación se mantiene con fines descriptivos y pedagógicos."**
+Con un $95\%$ de confianza, la nota final promedio de los estudiantes que estudian $3$ horas diarias, utilizan herramientas de inteligencia artificial y tenían una nota previa de $65$ puntos se encuentra entre **74.17 y 75.57 puntos**.
 
-l.  Predicción de un nuevo valor (puntual e intervalar)
+---
 
-En esta sección se realiza la predicción de la nota final de un estudiante individual, considerando características específicas. A diferencia de la pregunta anterior, aquí se incorpora no solo la incertidumbre del modelo, sino también la variabilidad individual, por lo que se utiliza un intervalo de predicción.
+##### **Nota de Rigor Estadístico**
 
-Paso 1: Selección y justificación del perfil del estudiante
+> "Aunque el modelo presenta un alto poder explicativo, se ha detectado la presencia de **heterocedasticidad** y desviaciones de la **normalidad** en los errores. Por tal motivo, el intervalo de confianza para la media debe interpretarse con **cautela**, ya que la varianza no constante puede afectar la precisión de la inferencia estadística. No obstante, la estimación se mantiene con fines descriptivos y pedagógicos".
+
+---
+
+$\text{Subsección C: Predicción Individual } \hat{Y}$
+
+En esta sección realizamos la predicción de la nota final de un estudiante específico. A diferencia de la estimación de la media, aquí incorporamos no solo la incertidumbre del modelo, sino también la variabilidad individual.
+
+*Paso 1: Selección y justificación del perfil del estudiante*
 
 Consideremos un estudiante con las siguientes características:
 
@@ -1046,6 +1104,11 @@ Consideremos un estudiante con las siguientes características:
 
 -   Nota previa: 70 puntos
 
+---
+
+<div style="background-color: #F4ECF7; padding: 15px; border-left: 6px solid #8E44AD; border-radius: 5px;">
+**Tomar en cuenta:** 
+
 Estos valores son coherentes porque:
 
 -   Se encuentran dentro del rango observado en el dataset.
@@ -1054,9 +1117,11 @@ Estos valores son coherentes porque:
 
 -   Permiten analizar el comportamiento del modelo en un nivel superior al promedio.
 
-l.1) Predicción puntual
+</div>
 
-Paso 2: Construcción del nuevo conjunto de datos (estudiante individual)
+---
+
+*Paso 2: Construcción del nuevo conjunto de datos (estudiante individual)*
 
 Se ingresa un nuevo data.frame que representa al estudiante individual a predecir.
 
@@ -1068,7 +1133,7 @@ nuevo_estudiante <- data.frame(
 )
 ```
 
-Paso 3: Predicción puntual del nuevo valor
+*Paso 3: Predicción puntual del nuevo valor*
 
 Aqui obtenemos la predicción puntual de la nota final del estudiante utilizando el modelo ajustado.
 
@@ -1077,19 +1142,41 @@ predict(modelo, newdata = nuevo_estudiante)
 
 ```
 
-Utilizando el modelo de regresión lineal múltiple ajustado, podemos  predecir que la nota final esperada para un estudiante que estudia 4 horas diarias, utiliza herramientas de inteligencia artificial y tenía una nota previa de 70 puntos es aproximadamente 79.70 puntos.
+**Interpretación:**
 
-l.2) Predicción intervalar (Intervalo de Predicción)
+Utilizando el modelo de regresión lineal múltiple ajustado, podemos predecir que la nota final esperada para un estudiante que estudia 4 horas diarias, utiliza herramientas de inteligencia artificial y tenía una nota previa de 70 puntos es aproximadamente 79.70 puntos.
 
-Para incorporar la variabilidad individual y la incertidumbre del modelo, se construye un intervalo de predicción al 95%.
+---
+
+$\text{Subsección D: Predicción intervalar (Intervalo de Predicción)}$
+
+Para capturar la verdadera incertidumbre de un caso particular, construimos un **Intervalo de Predicción al 95%**.
+
 
 ```{r}
 predict(modelo, newdata = nuevo_estudiante,
         interval = "prediction", level = 0.95)
 ```
 
-Con un 95% de confianza, la nota final de un estudiante que estudia 4 horas diarias, utiliza herramientas de inteligencia artificial y tenía una nota previa de 70 puntos se encontrará entre 75.20 y 84.20 puntos.
+**Interpretación:**
 
-Este intervalo de predicción incorpora tanto la incertidumbre del modelo como la variabilidad individual inherente al desempeño académico de cada estudiante.
+Con un $95\%$ de confianza, la nota de este estudiante se encontrará entre **75.20 y 84.20 puntos**. Este intervalo es notablemente más amplio que el de la media, ya que contempla la variabilidad inherente al desempeño académico individual.
 
-**"Debido a la presencia de heterocedasticidad en los errores del modelo, el intervalo de predicción puede no reflejar con total precisión la verdadera dispersión de los valores individuales. En consecuencia, la predicción debe interpretarse como una aproximación razonable y no como un valor exacto."**
+---
+
+> "Debido a la presencia de **heterocedasticidad** en los errores del modelo, el intervalo de predicción puede no reflejar con total precisión la verdadera dispersión de los valores individuales. En consecuencia, la predicción debe interpretarse como una aproximación razonable y no como un valor exacto."
+
+---
+
+## Conclusión final
+
+El análisis realizado demuestra que el modelo es una herramienta globalmente significativa para entender el rendimiento académico. Se concluye que:
+
+- Impacto de variables: El éxito del estudiante se apoya en su base académica previa (relación 1 a 1), pero se ve impulsado drásticamente por el uso de IA, que resultó ser más influyente que las horas de estudio tradicionales.
+
+- Fiabilidad: Aunque el modelo es potente para describir tendencias y realizar estimaciones promedio, los problemas de heterocedasticidad y normalidad detectados nos obligan a ser cautelosos con las predicciones individuales en los niveles de notas más altos.
+
+- Utilidad: La estadística nos permitió pasar de simples sospechas a confirmar con un 95% de confianza que la tecnología y el estudio dirigido pueden elevar significativamente las notas finales.
+
+En resumen, el modelo cumple su función pedagógica: nos enseña que la educación está cambiando y que, aunque los datos no sean perfectos, la tendencia hacia el éxito con apoyo digital es innegable.
+
